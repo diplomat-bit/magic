@@ -69,6 +69,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.555.0",
     "modern-treasury": "^3.3.0",
+    "msw": "^2.7.0",
     "notistack": "^3.0.2",
     "path": "^0.12.7",
     "plaid": "^20.0.0",
