@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { DataContext } from '../context/DataContext';
 import { APIStatus } from '../types';
 import {
@@ -158,6 +158,12 @@ const APIIntegrationView: React.FC = () => {
     const [localPlaidId, setLocalPlaidId] = useState('');
     const [localPlaidSecret, setLocalPlaidSecret] = useState('');
     const [localStripeKey, setLocalStripeKey] = useState('');
+
+    useEffect(() => {
+        setLocalGeminiKey(geminiApiKey || '');
+        setLocalMtKey(modernTreasuryApiKey || '');
+        setLocalMtOrgId(modernTreasuryOrganizationId || '');
+    }, [geminiApiKey, modernTreasuryApiKey, modernTreasuryOrganizationId]);
 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
