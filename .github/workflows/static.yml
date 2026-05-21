@@ -1,0 +1,93 @@
+name: AI-Assisted Iterative Build and Deploy
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      iteration:
+        description: 'Current iteration count'
+        required: false
+        default: '1'
+
+permissions:
+  contents: write  # Changed to write so AI/Workflow can push fixes if needed
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for better AI context if needed
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-size: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Attempt Build
+        id: build_step
+        run: |
+          echo "Starting build iteration..."
+          npm run build
+        continue-on-error: true # Crucial: Prevents the workflow from hard-failing immediately
+
+      - name: Handle Build Success
+        if: steps.build_step.outcome == 'success'
+        run: echo "Build succeeded! Proceeding to deployment."
+
+      # --- AI FEEDBACK LOOP SECTION ---
+      - name: Handle Build Failure & Notify AI
+        if: steps.build_step.outcome != 'success'
+        env:
+          # You will need to set up this secret pointing to your AI Agent/Server endpoint
+          AI_WEBHOOK_URL: ${{ secrets.AI_AGENT_WEBHOOK_URL }} 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Build failed. Gathering logs for AI..."
+          
+          # Capture the last 200 lines of the build log or error output
+          # In a real environment, you might fetch logs via GitHub API, 
+          # but we can grab standard errors or mock a log payload here.
+          
+          echo "Sending logs to AI agent..."
+          # Example webhook call sending the repository details so the AI can clone, fix, and push
+          curl -X POST -H "Content-Type: application/json" \
+            -d '{"repo": "${{ github.repository }}", "branch": "${{ github.ref_name }}", "status": "failed", "run_id": "${{ github.run_id }}"}' \
+            $AI_WEBHOOK_URL
+            
+          echo "Notification sent. Exiting workflow to await AI fix."
+          exit 1 # Fail the workflow here so you know it didn't deploy
+
+      # --- DEPLOYMENT SECTION (Only runs if build succeeded) ---
+      - name: Setup Pages
+        if: steps.build_step.outcome == 'success'
+        uses: actions/configure-pages@v5
+
+      # Adjust 'path' if your npm run build outputs to 'dist', 'build', or 'out'
+      - name: Upload artifact
+        if: steps.build_step.outcome == 'success'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist' 
+
+      - name: Deploy to GitHub Pages
+        if: steps.build_step.outcome == 'success'
+        id: deployment
+        uses: actions/deploy-pages@v5
