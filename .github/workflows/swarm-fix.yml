@@ -1,0 +1,46 @@
+name: Autonomous Gemini Code Alignment
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Reason for manual ignition"
+        required: false
+        default: "Manual Base Optimization Swarm"
+
+permissions:
+  contents: write  # Crucial: Gives the workflow permission to commit changes back
+
+jobs:
+  autonomous-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Execute Autonomous Gemini Fixes
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node .github/scripts/fix-code.js
+
+      - name: Commit and Push Structural Fixes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check if changes exist before trying to commit
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Modifications discovered. Committing alignments..."
+            git add .
+            git commit -m "style/fix: autonomous Gemini codebase optimization alignment"
+            git push origin HEAD:${{ github.ref_name }}
+          else
+            echo "No structural adjustments needed. Codebase is fully aligned."
+          fi
