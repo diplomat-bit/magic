@@ -328,7 +328,7 @@ const SAppLayout = () => {
       case View.StripeNexus: return <StripeNexusView />;
       case View.CounterpartyDashboard: return <CounterpartyDashboardView />;
       case View.VirtualAccounts: return <VirtualAccountsDashboard />;
-      case View.SApp: return <SAPP />;
+      case View.SApp: return <SApp />;
       case View.CorporateActions: return <CorporateActionsNexusView />;
       case View.CreditNoteLedger: return <CreditNoteLedger />;
       case View.ReconciliationHub: return <ReconciliationHubView />;
