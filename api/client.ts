@@ -1,18 +1,52 @@
 import axios from 'axios';
 
+// Detect the exact base URL of the environment the browser is running on
+const getBaseURL = (): string => {
+  // If running in a browser environment, deduce paths dynamically
+  if (typeof window !== 'undefined') {
+    const origin = window.location.origin;
+    
+    // Check if the current URL is a local development instance
+    if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+      return 'http://localhost:5000/api'; // Fallback to your local dev backend port
+    }
+    
+    // If running live on production (GitHub Pages / Vercel), point directly to its relative api gateway
+    return `${origin}/api`;
+  }
+  
+  return '/api'; // Standard static fallback
+};
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Request interceptor to securely append the authorization token
+apiClient.interceptors.request.use(
+  (config) => {
+    // Explicitly cast window configuration to avoid strict TypeScript metadata blocks
+    const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+    
+    if (token && config.url) {
+      // Guardrail: Detect absolute URLs to untrusted third-party domains
+      const isInternal = !config.url.startsWith('http://') && !config.url.startsWith('https://');
+      const isExplicitBase = config.baseURL && config.url.startsWith(config.baseURL);
+
+      // Securely append the bearer token only if it matches your application's domain environment
+      if (isInternal || isExplicitBase) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export default apiClient;
