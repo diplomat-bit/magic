@@ -37,6 +37,14 @@ interface ChatMessage {
     timestamp: Date;
 }
 
+// Define the expected type for DataContext methods used by this component.
+// Assuming DataContext provides a method to add dynamic KPIs.
+interface DataContextType {
+    addDynamicKpi: (kpi: { id: string; title: string; description: string }) => void;
+    // Add any other properties that DataContext provides and AIDynamicKpiButton uses
+}
+
+
 // --- CRYPTOGRAPHIC ENGINE (HOMOMORPHIC SIMULATION) ---
 // This simulates a high-security internal storage that allows operations on encrypted data.
 class QuantumVault {
@@ -88,13 +96,15 @@ class QuantumAIService {
 
     constructor() {
         // Accessing the secret from Vercel environment variables as requested
-        const apiKey = process.env.GEMINI_API_KEY || 'DEMO_KEY_FALLBACK';
+        // For client-side access in Next.js/Vercel, environment variables must be prefixed with NEXT_PUBLIC_
+        const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || 'DEMO_KEY_FALLBACK';
         try {
-            // @ts-ignore - Following the user's specific import/init pattern
+            // @ts-ignore - Following the user's specific import/init pattern for demo purposes.
+            // In a production client-side app, this would typically be a static import or an API call to a serverless function.
             const { GoogleGenAI } = require("@google/genai");
             this.client = new GoogleGenAI(apiKey);
         } catch (e) {
-            console.warn("AI Package not found, using mock simulation for demo.");
+            console.warn("AI Package not found or failed to initialize, using mock simulation for demo.", e);
         }
     }
 
@@ -161,8 +171,13 @@ const AIDynamicKpiButton: React.FC = () => {
     const [vaultKeys, setVaultKeys] = useState<{ name: string, value: string }[]>([]);
     const [stripeStatus, setStripeStatus] = useState<'idle' | 'processing' | 'success'>('idle');
 
+    // State for controlled Vault inputs
+    const [vaultKeyNameInput, setVaultKeyNameInput] = useState('');
+    const [vaultKeyValueInput, setVaultKeyValueInput] = useState('');
+
+
     const chatEndRef = useRef<HTMLDivElement>(null);
-    const context = useContext(DataContext);
+    const context = useContext(DataContext) as DataContextType | null; // Assert type of context
     const aiService = useMemo(() => new QuantumAIService(), []);
 
     // Audit Logger
@@ -213,7 +228,7 @@ const AIDynamicKpiButton: React.FC = () => {
     };
 
     const handleCreateKpi = () => {
-        if (!context) return;
+        if (!context) return; // Ensure context is available
         const kpiId = `KPI-${Date.now()}`;
         context.addDynamicKpi({
             id: kpiId,
@@ -399,18 +414,24 @@ const AIDynamicKpiButton: React.FC = () => {
                                                         type="text" 
                                                         placeholder="Integration Name (e.g. SAP_ERP_PROD)" 
                                                         className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:ring-1 focus:ring-cyan-500 outline-none"
+                                                        value={vaultKeyNameInput}
+                                                        onChange={(e) => setVaultKeyNameInput(e.target.value)}
                                                     />
                                                     <input 
                                                         id="vault-key-value"
                                                         type="password" 
                                                         placeholder="API Key / Secret" 
                                                         className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white focus:ring-1 focus:ring-cyan-500 outline-none"
+                                                        value={vaultKeyValueInput}
+                                                        onChange={(e) => setVaultKeyValueInput(e.target.value)}
                                                     />
                                                     <button 
                                                         onClick={() => {
-                                                            const n = (document.getElementById('vault-key-name') as HTMLInputElement).value;
-                                                            const v = (document.getElementById('vault-key-value') as HTMLInputElement).value;
-                                                            if(n && v) handleSaveKey(n, v);
+                                                            if(vaultKeyNameInput && vaultKeyValueInput) {
+                                                                handleSaveKey(vaultKeyNameInput, vaultKeyValueInput);
+                                                                setVaultKeyNameInput(''); // Clear input after saving
+                                                                setVaultKeyValueInput(''); // Clear input after saving
+                                                            }
                                                         }}
                                                         className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-lg transition-all shadow-lg shadow-cyan-900/20"
                                                     >
