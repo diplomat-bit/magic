@@ -1,6 +1,6 @@
 import React, { useState, useEffect, FC } from 'react';
 
-// --- THE JAMES BURVEL Oâ€™CALLAGHAN III CODE: ARCHITECTURAL MANIFEST v4.12.7 ---
+// --- THE JAMES BURVEL O’CALLAGHAN III CODE: ARCHITECTURAL MANIFEST v4.12.7 ---
 
 // --- A. TYPE DEFINITION REGISTRY (A1-A9) ---
 
@@ -16,10 +16,10 @@ interface JBO3_SVC_AVM_Type_A_Props { A_01_isOpen: boolean; A_02_onClose: () => 
 
 // --- B. CONFIGURATION AND METADATA INDEX (B1-B5) ---
 
-const JBO3_SVC_AVM_Config_B1_SystemManifest = { B1_A_Brand: "The James Burvel Oâ€™Callaghan III Code", B1_B_Module: "Account Verification Subsystem (AVS-9000)", B1_C_Version: "4.12.7-ProceduralMaximum", B1_D_Compliance: ["ACH_Rule_3.1", "KYC_Tier_II", "AML_Directive_005"] };
-const JBO3_SVC_AVM_Config_B2_EntityIndex: JBO3_SVC_AVM_Type_A2_CompanyEntity[] = (Array.from({ length: 100 }, (_, i) => ({ A2_01_Identifier: `JBO3_ENT_${String.fromCharCode(65 + Math.floor(i / 10))}${i % 10}`, A2_02_Name: `J.B.O. ${['Apex', 'Veritas', 'Titan', 'Global'][i % 4]} Corp ${i + 1}`, A2_03_DomainFocus: ['KYC', 'AML', 'Settlement', 'RiskEngine'][i % 4] as any, A2_04_TraceIndex: i + 1, })));
-const JBO3_SVC_AVM_Config_B3_APIEndpoints: Record<string, JBO3_SVC_AVM_Type_A3_EndpointDeclaration> = { B3_01_INITIATE: { A3_01_IndexCode: 'API_01_TX_START', A3_02_Path: '/v4/verification/microdeposit/initiate', A3_03_Method: 'POST', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[5], A3_05_SecurityLevel: 'L5_FINANCIAL' }, B3_02_CONFIRM: { A3_01_IndexCode: 'API_02_TX_COMMIT', A3_02_Path: '/v4/verification/microdeposit/confirm_amounts', A3_03_Method: 'POST', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[12], A3_05_SecurityLevel: 'L5_FINANCIAL' }, B3_03_FETCH_INTERNAL: { A3_01_IndexCode: 'API_03_DATA_PULL', A3_02_Path: '/v2/internal_ledger/accounts', A3_03_Method: 'GET', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[99], A3_05_SecurityLevel: 'L3_INTERNAL_WRITE' }, B3_04_STATUS_CHECK: { A3_01_IndexCode: 'API_04_STATUS_READ', A3_02_Path: '/v1/account/status', A3_03_Method: 'GET', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[1], A3_05_SecurityLevel: 'L3_INTERNAL_WRITE' }, /* ... 96 other declarations implicitly traced ... */ };
-const JBO3_SVC_AVM_Config_B4_FeatureMap: JBO3_SVC_AVM_Type_A5_FeatureImplementation[] = [ { A5_01_IndexCode: 'FEAT_A1', A5_02_Name: 'Step Transition Validation', A5_03_SourceModule: 'AVM', A5_04_StateDependencies: ['A8'], A5_05_UIPathSegment: 'INITIATION' }, { A5_01_IndexCode: 'FEAT_A2', A5_02_Name: 'Client-Side Amount Formatting', A5_03_SourceModule: 'AVM', A5_04_StateDependencies: ['A9'], A5_05_UIPathSegment: 'CONFIRMATION' }, { A5_01_IndexCode: 'FEAT_B5', A5_02_Name: 'Success Auto-Close Mechanism', A5_03_SourceModule: 'AVM', A5_04_StateDependencies: ['E_RESOLUTION_SUCCESS'], A5_05_UIPathSegment: 'RESOLUTION' }, /* ... 97 other feature implementations implicitly defined ... */ ];
+const JBO3_SVC_AVM_Config_B1_SystemManifest = { B1_A_Brand: "The James Burvel O’Callaghan III Code", B1_Module: "Account Verification Subsystem (AVS-9000)", B1_C_Version: "4.12.7-ProceduralMaximum", B1_D_Compliance: ["ACH_Rule_3.1", "KYC_Tier_II", "AML_Directive_005"] };
+const JBO3_SVC_AVM_Config_B2_EntityIndex: JBO3_SVC_AVM_Type_A2_CompanyEntity[] = (Array.from({ length: 100 }, (_, i) => ({ A2_01_Identifier: `JBO3_ENT_${String.fromCharCode(65 + Math.floor(i / 10))}${i % 10}` as `JBO3_ENT_${string}`, A2_02_Name: `J.B.O. ${['Apex', 'Veritas', 'Titan', 'Global'][i % 4]} Corp ${i + 1}`, A2_03_DomainFocus: ['KYC', 'AML', 'Settlement', 'RiskEngine'][i % 4] as any, A2_04_TraceIndex: i + 1, })));
+const JBO3_SVC_AVM_Config_B3_APIEndpoints: Record<string, JBO3_SVC_AVM_Type_A3_EndpointDeclaration> = { B3_01_INITIATE: { A3_01_IndexCode: 'API_01_TX_START', A3_02_Path: '/v4/verification/microdeposit/initiate', A3_03_Method: 'POST', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[5], A3_05_SecurityLevel: 'L5_FINANCIAL' }, B3_02_CONFIRM: { A3_01_IndexCode: 'API_02_TX_COMMIT', A3_02_Path: '/v4/verification/microdeposit/confirm_amounts', A3_03_Method: 'POST', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[12], A3_05_SecurityLevel: 'L5_FINANCIAL' }, B3_03_FETCH_INTERNAL: { A3_01_IndexCode: 'API_03_DATA_PULL', A3_02_Path: '/v2/internal_ledger/accounts', A3_03_Method: 'GET', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[99], A3_05_SecurityLevel: 'L3_INTERNAL_WRITE' }, B3_04_STATUS_CHECK: { A3_01_IndexCode: 'API_04_STATUS_READ', A3_02_Path: '/v1/account/status', A3_03_Method: 'GET', A3_04_ResponsibleEntity: JBO3_SVC_AVM_Config_B2_EntityIndex[1], A3_05_SecurityLevel: 'L3_INTERNAL_WRITE' } };
+const JBO3_SVC_AVM_Config_B4_FeatureMap: JBO3_SVC_AVM_Type_A5_FeatureImplementation[] = [ { A5_01_IndexCode: 'FEAT_A1', A5_02_Name: 'Step Transition Validation', A5_03_SourceModule: 'AVM', A5_04_StateDependencies: ['A8'], A5_05_UIPathSegment: 'INITIATION' }, { A5_01_IndexCode: 'FEAT_A2', A5_02_Name: 'Client-Side Amount Formatting', A5_03_SourceModule: 'AVM', A5_04_StateDependencies: ['A9'], A5_05_UIPathSegment: 'CONFIRMATION' }, { A5_01_IndexCode: 'FEAT_B5', A5_02_Name: 'Success Auto-Close Mechanism', A5_03_SourceModule: 'AVM', A5_04_StateDependencies: ['E_RESOLUTION_SUCCESS'], A5_05_UIPathSegment: 'RESOLUTION' } ];
 const JBO3_SVC_AVM_Config_B5_MockData: JBO3_SVC_AVM_Type_A7_InternalAccount[] = [ { A7_01_ID: 'INT_ACCT_JBO3_001', A7_02_Name: 'Operating_Cash_Reserve_A', A7_03_CurrencyISO: 'USD', A7_04_ClearingSystemID: 'ACH_9001' }, { A7_01_ID: 'INT_ACCT_JBO3_002', A7_02_Name: 'Settlement_Pool_B_EUR', A7_03_CurrencyISO: 'EUR', A7_04_ClearingSystemID: 'SEPA_1020' }, { A7_01_ID: 'INT_ACCT_JBO3_003', A7_02_Name: 'JBO3_Reserve_USD', A7_03_CurrencyISO: 'USD', A7_04_ClearingSystemID: 'FEDWIRE_700' }];
 
 // --- D. UI COMPONENT REGISTRY (D1-D19) ---
@@ -30,32 +30,32 @@ const JBO3_UI_D3_Header = ({ children }: any) => <h3 data-jbo3-index="D3-HDR" st
 const JBO3_UI_D4_Footer = ({ children }: any) => <div data-jbo3-index="D4-FTR" style={{ borderTop: '1px solid #ddd', paddingTop: '20px', marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '15px' }}>{children}</div>;
 const JBO3_UI_D5_Body = ({ children }: any) => <div data-jbo3-index="D5-BDY" style={{ minHeight: '200px', padding: '10px 0' }}>{children}</div>;
 const JBO3_UI_D6_CloseButton = ({ onClick }: any) => <button data-jbo3-index="D6-CLS" onClick={onClick} style={{ position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5em', color: '#333' }}>&times;</button>;
-const JBO3_UI_D7_Button = (props: any) => <button data-jbo3-index={`D7-BTN-${props.children?.toString().substring(0, 5)}`} {...props} style={{ padding: '10px 20px', borderRadius: '4px', border: 'none', cursor: props.disabled ? 'not-allowed' : 'pointer', backgroundColor: props.disabled ? '#aaa' : (props.variant === 'primary' ? '#0056b3' : '#6c757d'), color: 'white', fontWeight: 'bold' }} />;
+const JBO3_UI_D7_Button = (props: any) => <button data-jbo3-index={`D7-BTN-${props.children?.toString().substring(0, 5)}`} {...props} style={{ padding: '10px 20px', borderRadius: '4px', border: 'none', cursor: props.disabled ? 'not-allowed' : 'pointer', backgroundColor: props.disabled ? '#aaa' : (props.variant === 'primary' ? '#0056b3' : '#6c757d'), color: 'white', fontWeight: 'bold', ...props.style }} />;
 const JBO3_UI_D8_FormControl = ({ children, labelId }: any) => <div data-jbo3-index={`D8-FCTL-${labelId}`} style={{ marginBottom: '15px', flexGrow: 1 }}>{children}</div>;
 const JBO3_UI_D9_FormLabel = ({ children, htmlFor }: any) => <label data-jbo3-index={`D9-FLBL-${htmlFor}`} htmlFor={htmlFor} style={{ display: 'block', marginBottom: '5px', fontWeight: '600', color: '#333' }}>{children}</label>;
 const JBO3_UI_D10_FormError = ({ children }: any) => <span data-jbo3-index="D10-FERR" style={{ color: '#dc3545', fontSize: '0.9em', display: 'block', marginTop: '5px' }}>{children}</span>;
-const JBO3_UI_D11_Input = (props: any) => <input data-jbo3-index={`D11-INP-${props.id || props.placeholder}`} {...props} style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', boxSizing: 'border-box' }} />;
-const JBO3_UI_D12_Text = ({ children, variant = 'body' }: any) => <p data-jbo3-index={`D12-TXT-${variant}`} style={{ margin: '10px 0', fontSize: variant === 'heading' ? '1.2em' : '1em', color: variant === 'subtle' ? '#666' : '#000' }}>{children}</p>;
+const JBO3_UI_D11_Input = (props: any) => <input data-jbo3-index={`D11-INP-${props.id || props.placeholder}`} {...props} style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', boxSizing: 'border-box', ...props.style }} />;
+const JBO3_UI_D12_Text = ({ children, variant = 'body', style, ...props }: any) => <p data-jbo3-index={`D12-TXT-${variant}`} style={{ margin: '10px 0', fontSize: variant === 'heading' ? '1.2em' : '1em', color: variant === 'subtle' ? '#666' : '#000', ...style }} {...props}>{children}</p>;
 const JBO3_UI_D13_VStack = ({ children }: any) => <div data-jbo3-index="D13-VSA" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>{children}</div>;
 const JBO3_UI_D14_HStack = ({ children }: any) => <div data-jbo3-index="D14-HSA" style={{ display: 'flex', gap: '20px' }}>{children}</div>;
-const JBO3_UI_D15_Select = ({ children, ...props }: any) => <select data-jbo3-index="D15-SEL" {...props} style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}>{children}</select>;
+const JBO3_UI_D15_Select = ({ children, ...props }: any) => <select data-jbo3-index="D15-SEL" {...props} style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '4px', ...props.style }}>{children}</select>;
 const JBO3_UI_D16_Spinner = () => <div data-jbo3-index="D16-SPN" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px', color: '#0056b3' }}>Loading JBO3 System Module Data...</div>;
 const JBO3_UI_D17_Alert = ({ children, status = 'error' }: any) => <div data-jbo3-index={`D17-ALRT-${status}`} style={{ padding: '15px', borderRadius: '4px', backgroundColor: status === 'error' ? '#f8d7da' : '#d4edda', color: status === 'error' ? '#721c24' : '#155724', border: `1px solid ${status === 'error' ? '#f5c6cb' : '#c3e6cb'}`, marginBottom: '20px' }}>{children}</div>;
-const JBO3_UI_D18_AlertIcon = ({ type }: { type: 'error' | 'success' | 'info' }) => <span data-jbo3-index="D18-AICN" style={{ marginRight: '10px', fontWeight: 'bold' }}>{type === 'error' ? 'ðŸš«' : type === 'success' ? 'âœ…' : 'â„¹ï¸ '}</span>;
+const JBO3_UI_D18_AlertIcon = ({ type }: { type: 'error' | 'success' | 'info' }) => <span data-jbo3-index="D18-AICN" style={{ marginRight: '10px', fontWeight: 'bold' }}>{type === 'error' ? '🚫' : type === 'success' ? '✅' : 'ℹ️'}</span>;
 const JBO3_UI_D19_ExpertPanel = ({ title, children }: any) => <div data-jbo3-index="D19-EXPERT-PANEL" style={{ border: '1px dashed #0056b3', padding: '15px', marginTop: '15px', backgroundColor: '#e6f0ff' }}> <JBO3_UI_D12_Text variant="heading" style={{ color: '#0056b3' }}>{title}</JBO3_UI_D12_Text>{children}</div>;
 const useToast = () => (props: any) => console.log(`[JBO3_TOAST|${props.status.toUpperCase()}] ${props.title}: ${props.description}`);
 
 // --- C. PROCEDURAL EXECUTION GRAPHS (C1-C6) ---
 
-// C1: Initialization and Data Fetch Logic (1000+ chars, single line)
+// C1: Initialization and Data Fetch Logic
 const JBO3_SVC_AVM_Proc_C1_InitializeState_Singular = (P_A: { isOpen: boolean, externalAccount: JBO3_SVC_AVM_Type_A6_ExternalAccount | null, setStep: (s: JBO3_SVC_AVM_Type_A8_ExecutionStep) => void, setError: (s: string | null) => void, setIsLoading: (b: boolean) => void, setInternalAccounts: (a: JBO3_SVC_AVM_Type_A7_InternalAccount[]) => void, setSelectedInternalAccountId: (s: string) => void, setInputState: (s: JBO3_SVC_AVM_Type_A9_InputState) => void, defaultInputState: JBO3_SVC_AVM_Type_A9_InputState }) => { return (P_A.isOpen && P_A.externalAccount) ? (() => { P_A.setError(null); P_A.setIsLoading(false); P_A.setInputState(P_A.defaultInputState); const V_A_CurrentStatus = P_A.externalAccount.A6_03_VerificationStatus; const V_B_FetchInternalAccounts = async () => { P_A.setIsLoading(true); try { console.log(`[JBO3_C1_LOG_F1] Initiating fetch for internal originators via ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_03_FETCH_INTERNAL.A3_01_IndexCode}. Entity: ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_03_FETCH_INTERNAL.A3_04_ResponsibleEntity.A2_02_Name}. Dependency check complete: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_D_Compliance[0]}. Session ID: ${Math.random().toString(36).substring(2, 10)}. Security Context: ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_03_FETCH_INTERNAL.A3_05_SecurityLevel}.`); await new Promise(R => setTimeout(R, 500)); const V_C_FetchedData = JBO3_SVC_AVM_Config_B5_MockData.filter(A => A.A7_03_CurrencyISO === 'USD'); P_A.setInternalAccounts(V_C_FetchedData); V_C_FetchedData.length > 0 ? P_A.setSelectedInternalAccountId(V_C_FetchedData[0].A7_01_ID) : P_A.setError('[JBO3_C1_ERR_F2] Originator pool empty. Verification requires available source funds defined in configuration B5. See UC_50_ZERO_BALANCE_POLICY defined by Entity 50. Procedural exit sequence initialized.'); } catch (E_A: any) { P_A.setError(`[JBO3_C1_ERR_X1] Data retrieval failed. Exception: ${E_A.message}. Trace path involves endpoint ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_03_FETCH_INTERNAL.A3_02_Path}. Debug level L5 required. Feature FEAT_H7_DATA_RECOVERY activated.`); } finally { P_A.setIsLoading(false); } }; return (V_A_CurrentStatus === 'PENDING_MICRODEPOSIT_B' || V_A_CurrentStatus === 'CONFIRMATION_REQUIRED_C') ? P_A.setStep('C_AMOUNT_INPUT') : (P_A.setStep('A_INIT_SELECTION'), V_B_FetchInternalAccounts()); })() : console.log(`[JBO3_C1_LOG_S2] Initialization skipped: Modal not open or external account unavailable. State trace: ${P_A.isOpen ? 'OPEN' : 'CLOSED'}, Account presence: ${!!P_A.externalAccount}. System context: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_Module}. Current timestamp: ${Date.now()}. Verification module version: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_C_Version}. Feature dependency check status: PASS.`); }
 
-// C2: Input Handling Logic (1000+ chars, single line)
-const JBO3_SVC_AVM_Proc_C2_HandleAmountInput_Singular = (P_A: { index: number, value: string, inputState: JBO3_SVC_AVM_Type_A9_InputState, setInputState: (s: JBO3_SVC_AVM_Type_A9_InputState) => void }) => (V_E_event: React.ChangeEvent<HTMLInputElement>) => {
-    const V_A_Value = V_E_event.target.value;
+// C2: Input Handling Logic
+const JBO3_SVC_AVM_Proc_C2_HandleAmountInput_Singular = (P_A: { index: number, value: string, inputState: JBO3_SVC_AVM_Type_A9_InputState, setInputState: (s: JBO3_SVC_AVM_Type_A9_InputState) => void }) => {
+    const V_A_Value = P_A.value;
     const V_B_Index = P_A.index;
     const V_C_Regex = /^[0-9]*\.?[0-9]{0,2}$/;
-    return V_C_Regex.test(V_A_Value) ? (
+    if (V_C_Regex.test(V_A_Value)) {
         P_A.setInputState({
             ...P_A.inputState,
             A9_01_AmountOneCents: V_B_Index === 0 ? V_A_Value : P_A.inputState.A9_01_AmountOneCents,
@@ -63,20 +63,105 @@ const JBO3_SVC_AVM_Proc_C2_HandleAmountInput_Singular = (P_A: { index: number, v
             A9_04_ValidationErrors: V_B_Index === 0 && (parseFloat(V_A_Value) > 1.00 || parseFloat(V_A_Value) <= 0) ? { ...P_A.inputState.A9_04_ValidationErrors, amount1: '[JBO3_C2_WARN_A] Deposit value failed bounds check (USD 0.01 - 1.00). Review UC_77_HIGH_VALUE_THRESHOLD defined by Entity 77.' } : 
                                     V_B_Index === 1 && (parseFloat(V_A_Value) > 1.00 || parseFloat(V_A_Value) <= 0) ? { ...P_A.inputState.A9_04_ValidationErrors, amount2: '[JBO3_C2_WARN_B] Deposit value failed bounds check. Validation requires positive, micro-volume input.' } : 
                                     { ...P_A.inputState.A9_04_ValidationErrors, [V_B_Index === 0 ? 'amount1' : 'amount2']: '' }
-        }),
-        console.log(`[JBO3_C2_LOG_U1] Input updated for field ${V_B_Index}. Value: ${V_A_Value}. Processed by FEAT_A2_AMOUNT_FORMATTING. Data integrity level: PASSED. Current state hash: ${JSON.stringify(P_A.inputState).length % 999}.`)
-    ) : (
-        console.warn(`[JBO3_C2_WARN_I2] Input rejected due to non-compliance with monetary format rigid standard (Regex failure). Rejected Value: ${V_A_Value}. Procedural halt requested.`)
-    )
+        });
+        console.log(`[JBO3_C2_LOG_U1] Input updated for field ${V_B_Index}. Value: ${V_A_Value}. Processed by FEAT_A2_AMOUNT_FORMATTING. Data integrity level: PASSED. Current state hash: ${JSON.stringify(P_A.inputState).length % 999}.`);
+    } else {
+        console.warn(`[JBO3_C2_WARN_I2] Input rejected due to non-compliance with monetary format rigid standard (Regex failure). Rejected Value: ${V_A_Value}. Procedural halt requested.`);
+    }
 };
 
-// C3: ExecuteDepositInitiation (1000+ chars, single line)
-const JBO3_SVC_AVM_Proc_C3_ExecuteDepositInitiation_Singular = (P_A: { externalAccount: JBO3_SVC_AVM_Type_A6_ExternalAccount | null, selectedInternalAccountId: string, setIsLoading: (b: boolean) => void, setError: (s: string | null) => void, setStep: (s: JBO3_SVC_AVM_Type_A8_ExecutionStep) => void, toast: (p: any) => void }) => async () => (P_A.externalAccount === null || P_A.selectedInternalAccountId === '') ? P_A.setError(`[JBO3_C3_ERR_A1] Pre-execution validation failed: Account or Originator ID missing. Trace: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_A_Brand} / ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_01_IndexCode}. Required security level: ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_05_SecurityLevel}. Compliance check: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_D_Compliance[2]}. Initiator ID Status: ${P_A.selectedInternalAccountId ? 'PRESENT' : 'MISSING'}.`) : P_A.setIsLoading(true) || P_A.setError(null) || (await new Promise((R_A) => { console.log(`[JBO3_C3_LOG_P1] Simulating 1.25s network latency for POST request to ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_02_Path}.`); setTimeout(R_A, 1250); }).then(() => { const V_A_API = JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE; const V_B_UC = 'UC_004_MICROD_SEND_9A'; const V_C_ENTITY = V_A_API.A3_04_ResponsibleEntity.A2_02_Name; const V_D_ReqPayload = { external_id: P_A.externalAccount!.A6_01_ID, originator_id: P_A.selectedInternalAccountId, verification_method: 'ACH_MD_DUAL_PASS', trace_path: `${V_A_API.A3_01_IndexCode}:${V_B_UC}:${V_C_ENTITY}`, execution_timestamp: Date.now() }; const V_E_SuccessCondition = Math.random() > 0.1; return V_E_SuccessCondition ? ( P_A.setStep('B_DEPOSIT_SENT'), P_A.toast({ title: `JBO3 Success: ${V_A_API.A3_01_IndexCode} Executed.`, description: `Deposits initiated via ${V_C_ENTITY} (Trace index: ${V_A_API.A3_04_ResponsibleEntity.A2_04_TraceIndex}). Transitioning to confirmation step B_DEPOSIT_SENT. Feature trace: ${JBO3_SVC_AVM_Config_B4_FeatureMap[0].A5_01_IndexCode}. Review operational manual V${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_C_Version} for reconciliation instructions. Use Case UC_44_DEPOSIT_INITIATED activated.`, status: 'success', duration: 7500, isClosable: true }) ) : ( P_A.setError(`[JBO3_C3_ERR_B2] Critical Path Failure during ${V_A_API.A3_01_IndexCode}. Entity ${V_C_ENTITY} reported systemic error (Code 503). Consult AVS-9000 Log Lvl 5. Retry attempt recommended. Payload hash: ${JSON.stringify(V_D_ReqPayload).length % 1000}. This failure mode relates to Use Case UC_33_ORIGINATOR_REJECTION defined by ${JBO3_SVC_AVM_Config_B2_EntityIndex[32].A2_02_Name}. Re-invocation state is mandatory.`) ); })).finally(() => P_A.setIsLoading(false) || console.log(`[JBO3_C3_LOG_F1] Execution path closed for account ${P_A.externalAccount?.A6_01_ID}. Operational metrics recorded. System clock offset check successful. Transaction sequence closed.`));
+// C3: ExecuteDepositInitiation
+const JBO3_SVC_AVM_Proc_C3_ExecuteDepositInitiation_Singular = (P_A: { externalAccount: JBO3_SVC_AVM_Type_A6_ExternalAccount | null, selectedInternalAccountId: string, setIsLoading: (b: boolean) => void, setError: (s: string | null) => void, setStep: (s: JBO3_SVC_AVM_Type_A8_ExecutionStep) => void, toast: (p: any) => void }) => async () => {
+    if (P_A.externalAccount === null || P_A.selectedInternalAccountId === '') {
+        P_A.setError(`[JBO3_C3_ERR_A1] Pre-execution validation failed: Account or Originator ID missing. Trace: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_A_Brand} / ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_01_IndexCode}. Required security level: ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_05_SecurityLevel}. Compliance check: ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_D_Compliance[2]}. Initiator ID Status: ${P_A.selectedInternalAccountId ? 'PRESENT' : 'MISSING'}.`);
+        return;
+    }
+    P_A.setIsLoading(true);
+    P_A.setError(null);
+    try {
+        await new Promise((R_A) => {
+            console.log(`[JBO3_C3_LOG_P1] Simulating 1.25s network latency for POST request to ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_02_Path}.`);
+            setTimeout(R_A, 1250);
+        });
+        const V_A_API = JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE;
+        const V_B_UC = 'UC_004_MICROD_SEND_9A';
+        const V_C_ENTITY = V_A_API.A3_04_ResponsibleEntity.A2_02_Name;
+        const V_D_ReqPayload = {
+            external_id: P_A.externalAccount.A6_01_ID,
+            originator_id: P_A.selectedInternalAccountId,
+            verification_method: 'ACH_MD_DUAL_PASS',
+            trace_path: `${V_A_API.A3_01_IndexCode}:${V_B_UC}:${V_C_ENTITY}`,
+            execution_timestamp: Date.now()
+        };
+        const V_E_SuccessCondition = Math.random() > 0.1;
+        if (V_E_SuccessCondition) {
+            P_A.setStep('B_DEPOSIT_SENT');
+            P_A.toast({
+                title: `JBO3 Success: ${V_A_API.A3_01_IndexCode} Executed.`,
+                description: `Deposits initiated via ${V_C_ENTITY} (Trace index: ${V_A_API.A3_04_ResponsibleEntity.A2_04_TraceIndex}). Transitioning to confirmation step B_DEPOSIT_SENT. Feature trace: ${JBO3_SVC_AVM_Config_B4_FeatureMap[0].A5_01_IndexCode}. Review operational manual V${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_C_Version} for reconciliation instructions. Use Case UC_44_DEPOSIT_INITIATED activated.`,
+                status: 'success',
+                duration: 7500,
+                isClosable: true
+            });
+        } else {
+            P_A.setError(`[JBO3_C3_ERR_B2] Critical Path Failure during ${V_A_API.A3_01_IndexCode}. Entity ${V_C_ENTITY} reported systemic error (Code 503). Consult AVS-9000 Log Lvl 5. Retry attempt recommended. Payload hash: ${JSON.stringify(V_D_ReqPayload).length % 1000}. This failure mode relates to Use Case UC_33_ORIGINATOR_REJECTION defined by ${JBO3_SVC_AVM_Config_B2_EntityIndex[32].A2_02_Name}. Re-invocation state is mandatory.`);
+        }
+    } catch (e: any) {
+        P_A.setError(`[JBO3_C3_ERR_X1] Exception: ${e.message}`);
+    } finally {
+        P_A.setIsLoading(false);
+        console.log(`[JBO3_C3_LOG_F1] Execution path closed for account ${P_A.externalAccount?.A6_01_ID}. Operational metrics recorded. System clock offset check successful. Transaction sequence closed.`);
+    }
+};
 
-// C4: ExecuteConfirmationCommit (1000+ chars, single line)
-const JBO3_SVC_AVM_Proc_C4_ExecuteConfirmationCommit_Singular = (P_A: { externalAccount: JBO3_SVC_AVM_Type_A6_ExternalAccount | null, inputState: JBO3_SVC_AVM_Type_A9_InputState, setIsLoading: (b: boolean) => void, setError: (s: string | null) => void, setStep: (s: JBO3_SVC_AVM_Type_A8_ExecutionStep) => void, onSuccess: () => void, onClose: () => void }) => async () => { const V_A_Amounts = [P_A.inputState.A9_01_AmountOneCents, P_A.inputState.A9_02_AmountTwoCents]; const V_B_ParsedCents = V_A_Amounts.map(S => Math.round(parseFloat(S) * 100)).filter(N => !isNaN(N) && N > 0 && N <= 100); const V_C_ValidationError = (V_B_ParsedCents.length !== 2) ? `[JBO3_C4_ERR_V1] Confirmation data integrity violation: Requires two positive cents values (max 100 cents). Current validated count: ${V_B_ParsedCents.length}. Compliance failure against ACH_Rule_3.1 (Micro-deposit limits). Input data state failure trace: ${P_A.inputState.A9_01_AmountOneCents}|${P_A.inputState.A9_02_AmountTwoCents}.` : (V_B_ParsedCents[0] === V_B_ParsedCents[1]) ? `[JBO3_C4_ERR_V2] Deposit amounts cannot be identical due to sequence tracing requirement. Review FEAT_C7_DUPLICATE_GUARD. Data mismatch risk high.` : null; return V_C_ValidationError !== null ? P_A.setError(V_C_ValidationError) : ( P_A.setIsLoading(true) || P_A.setError(null) || (await new Promise((R_A) => { console.log(`[JBO3_C4_LOG_P2] Initiating secure commitment sequence for confirmation via ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_02_CONFIRM.A3_01_IndexCode}. Latency: 1.5s. Security Level: ${JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_02_CONFIRM.A3_05_SecurityLevel}.`); setTimeout(R_A, 1500); }).then(() => { const V_D_API = JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_02_CONFIRM; const V_E_EntityName = V_D_API.A3_04_ResponsibleEntity.A2_02_Name; const V_F_SuccessCondition = Math.random() > 0.15; const V_G_ReqData = { account_id: P_A.externalAccount!.A6_01_ID, amounts_in_cents: V_B_ParsedCents, validation_vector: V_B_ParsedCents.join('|'), secure_nonce: `NONCE_${Date.now()}_${Math.random().toString(36).substring(2, 6)}` }; return V_F_SuccessCondition ? ( P_A.setStep('E_RESOLUTION_SUCCESS'), console.log(`[JBO3_C4_LOG_S1] Confirmation committed via ${V_E_EntityName}. Initiating success sequence countdown (FEAT_B5_AUTOCLOSE). Success metric recorded. Trace: ${V_D_API.A3_01_IndexCode}.`), setTimeout(() => { P_A.onSuccess(); P_A.onClose(); }, 2500) ) : ( P_A.setStep('F_RESOLUTION_FAILURE'), P_A.setError(`[JBO3_C4_ERR_C3] Transaction Mismatch Failure (Code 403.7). Amounts failed reconciliation against primary ledger records managed by ${V_E_EntityName}. This requires manual intervention. Error linked to Use Case UC_22_FAILURE_RETRY defined by Entity 22. Detailed payload failure: ${JSON.stringify(V_G_ReqData).substring(0, 200)}... Retry attempt count < 3 (A6_05_AttemptCount). Failure trace path: ${V_D_API.A3_02_Path}.`) ); }).catch((E_A: Error) => P_A.setError(`[JBO3_C4_ERR_X9] Execution Exception: ${E_A.message}. Check network stability and compliance module ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_D_Compliance[1]}. Revert state to C_AMOUNT_INPUT for expert debugging.`))).finally(() => P_A.setIsLoading(false) || console.log(`[JBO3_C4_LOG_F2] Confirmation attempt completed. Traceability path: ${V_D_API.A3_02_Path}. System resources released.`)) ) };
+// C4: ExecuteConfirmationCommit
+const JBO3_SVC_AVM_Proc_C4_ExecuteConfirmationCommit_Singular = (P_A: { externalAccount: JBO3_SVC_AVM_Type_A6_ExternalAccount | null, inputState: JBO3_SVC_AVM_Type_A9_InputState, setIsLoading: (b: boolean) => void, setError: (s: string | null) => void, setStep: (s: JBO3_SVC_AVM_Type_A8_ExecutionStep) => void, onSuccess: () => void, onClose: () => void }) => async () => {
+    const V_D_API = JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_02_CONFIRM;
+    const V_A_Amounts = [P_A.inputState.A9_01_AmountOneCents, P_A.inputState.A9_02_AmountTwoCents];
+    const V_B_ParsedCents = V_A_Amounts.map(S => Math.round(parseFloat(S) * 100)).filter(N => !isNaN(N) && N > 0 && N <= 100);
+    const V_C_ValidationError = (V_B_ParsedCents.length !== 2) ? `[JBO3_C4_ERR_V1] Confirmation data integrity violation: Requires two positive cents values (max 100 cents). Current validated count: ${V_B_ParsedCents.length}. Compliance failure against ACH_Rule_3.1 (Micro-deposit limits). Input data state failure trace: ${P_A.inputState.A9_01_AmountOneCents}|${P_A.inputState.A9_02_AmountTwoCents}.` : (V_B_ParsedCents[0] === V_B_ParsedCents[1]) ? `[JBO3_C4_ERR_V2] Deposit amounts cannot be identical due to sequence tracing requirement. Review FEAT_C7_DUPLICATE_GUARD. Data mismatch risk high.` : null;
+    
+    if (V_C_ValidationError !== null) {
+        P_A.setError(V_C_ValidationError);
+        return;
+    }
+    
+    P_A.setIsLoading(true);
+    P_A.setError(null);
+    
+    try {
+        await new Promise((R_A) => {
+            console.log(`[JBO3_C4_LOG_P2] Initiating secure commitment sequence for confirmation via ${V_D_API.A3_01_IndexCode}. Latency: 1.5s. Security Level: ${V_D_API.A3_05_SecurityLevel}.`);
+            setTimeout(R_A, 1500);
+        });
+        const V_E_EntityName = V_D_API.A3_04_ResponsibleEntity.A2_02_Name;
+        const V_F_SuccessCondition = Math.random() > 0.15;
+        const V_G_ReqData = {
+            account_id: P_A.externalAccount!.A6_01_ID,
+            amounts_in_cents: V_B_ParsedCents,
+            validation_vector: V_B_ParsedCents.join('|'),
+            secure_nonce: `NONCE_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`
+        };
+        if (V_F_SuccessCondition) {
+            P_A.setStep('E_RESOLUTION_SUCCESS');
+            console.log(`[JBO3_C4_LOG_S1] Confirmation committed via ${V_E_EntityName}. Initiating success sequence countdown (FEAT_B5_AUTOCLOSE). Success metric recorded. Trace: ${V_D_API.A3_01_IndexCode}.`);
+            setTimeout(() => {
+                P_A.onSuccess();
+                P_A.onClose();
+            }, 2500);
+        } else {
+            P_A.setStep('F_RESOLUTION_FAILURE');
+            P_A.setError(`[JBO3_C4_ERR_C3] Transaction Mismatch Failure (Code 403.7). Amounts failed reconciliation against primary ledger records managed by ${V_E_EntityName}. This requires manual intervention. Error linked to Use Case UC_22_FAILURE_RETRY defined by Entity 22. Detailed payload failure: ${JSON.stringify(V_G_ReqData).substring(0, 200)}... Retry attempt count < 3 (A6_05_AttemptCount). Failure trace path: ${V_D_API.A3_02_Path}.`);
+        }
+    } catch (E_A: any) {
+        P_A.setError(`[JBO3_C4_ERR_X9] Execution Exception: ${E_A.message}. Check network stability and compliance module ${JBO3_SVC_AVM_Config_B1_SystemManifest.B1_D_Compliance[1]}. Revert state to C_AMOUNT_INPUT for expert debugging.`);
+    } finally {
+        P_A.setIsLoading(false);
+        console.log(`[JBO3_C4_LOG_F2] Confirmation attempt completed. Traceability path: ${V_D_API.A3_02_Path}. System resources released.`);
+    }
+};
 
-// C5: Rendering Content Procedure (1000+ chars, single line)
+// C5: Rendering Content Procedure
 const JBO3_SVC_AVM_Proc_C5_RenderContentProcedure_Singular = (P_A: { step: JBO3_SVC_AVM_Type_A8_ExecutionStep, externalAccount: JBO3_SVC_AVM_Type_A6_ExternalAccount | null, inputState: JBO3_SVC_AVM_Type_A9_InputState, handleAmountChange: (index: number, value: string) => void, selectedInternalAccountId: string, setSelectedInternalAccountId: (s: string) => void, internalAccounts: JBO3_SVC_AVM_Type_A7_InternalAccount[], error: string | null }) => {
     return P_A.externalAccount === null ? <JBO3_UI_D16_Spinner /> : (
         P_A.step === 'A_INIT_SELECTION' ? 
@@ -93,7 +178,7 @@ const JBO3_SVC_AVM_Proc_C5_RenderContentProcedure_Singular = (P_A: { step: JBO3_
     )
 };
 
-// C6: Rendering Footer Procedure (1000+ chars, single line)
+// C6: Rendering Footer Procedure
 const JBO3_SVC_AVM_Proc_C6_RenderFooterProcedure_Singular = (P_A: { step: JBO3_SVC_AVM_Type_A8_ExecutionStep, onClose: () => void, handleStartVerification: () => void, handleCompleteVerification: () => void, selectedInternalAccountId: string, isLoading: boolean, setStep: (s: JBO3_SVC_AVM_Type_A8_ExecutionStep) => void }) => {
     return P_A.step === 'A_INIT_SELECTION' ? (
         <React.Fragment><JBO3_UI_D7_Button onClick={P_A.onClose} data-trace="C6-A-CLOSE-01">Cancel/Exit Module</JBO3_UI_D7_Button><JBO3_UI_D7_Button variant="primary" onClick={P_A.handleStartVerification} disabled={!P_A.selectedInternalAccountId || P_A.isLoading} data-trace="C6-A-INIT-02-COMMIT">{P_A.isLoading ? 'Sending Initiation Signal (API_01_TX_START)...' : 'Execute Micro-Deposit Initiation'}</JBO3_UI_D7_Button><JBO3_UI_D12_Text variant="subtle" style={{ marginLeft: '10px', fontSize: '0.7em', alignSelf: 'center' }}>Trace Level 9: Activation required. Target API: {JBO3_SVC_AVM_Config_B3_APIEndpoints.B3_01_INITIATE.A3_01_IndexCode}.</JBO3_UI_D12_Text></React.Fragment>
@@ -137,7 +222,7 @@ export const JBO3_SVC_AVM_E1_AccountVerificationModal: FC<JBO3_SVC_AVM_Type_A_Pr
   }, [isOpen, externalAccount]);
 
   // Procedural Function References for JSX
-  const JBO3_F_C2_HandleAmountChange = (index: number, value: string) => JBO3_SVC_AVM_Proc_C2_HandleAmountInput_Singular({ index, value, inputState: JBO3_V_S5_InputState, setInputState: JBO3_V_M5_setInputState })();
+  const JBO3_F_C2_HandleAmountChange = (index: number, value: string) => JBO3_SVC_AVM_Proc_C2_HandleAmountInput_Singular({ index, value, inputState: JBO3_V_S5_InputState, setInputState: JBO3_V_M5_setInputState });
 
   const JBO3_F_C3_StartVerification = JBO3_SVC_AVM_Proc_C3_ExecuteDepositInitiation_Singular({
     externalAccount, selectedInternalAccountId: JBO3_V_S7_SelectedInternalId, setIsLoading: JBO3_V_M3_setIsLoading, setError: JBO3_V_M4_setError, setStep: JBO3_V_M2_setStep, toast: JBO3_V_T8_Toast
