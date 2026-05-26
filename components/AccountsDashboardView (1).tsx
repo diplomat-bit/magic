@@ -47,15 +47,15 @@ const Flex: React.FC<{ direction?: 'row' | 'column'; gap?: number; children: Rea
   <div style={{ display: 'flex', flexDirection: direction, gap: gap ? `${gap * 4}px` : undefined }}>{children}</div>
 );
 
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement("style");
-  styleSheet.type = "text/css";
-  styleSheet.innerText = `@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }`;
-  document.head.appendChild(styleSheet);
-}
+// Self-contained style injection
+const GlobalStyles = () => (
+  <style>{`
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `}</style>
+);
 
 type Currency = 'USD' | 'CAD' | 'AED' | 'AFN' | 'ALL' | 'AMD' | 'ANG' | 'AOA' | 'ARS' | 'AUD' | 'AWG' | 'AZN' | 'BAM' | 'BBD' | 'BCH' | 'BDT' | 'BGN' | 'BHD' | 'BIF' | 'BMD' | 'BND' | 'BOB' | 'BRL' | 'BSD' | 'BTC' | 'BTN' | 'BWP' | 'BYN' | 'BYR' | 'BZD' | 'CDF' | 'CHF' | 'CLF' | 'CLP' | 'CNH' | 'CNY' | 'COP' | 'CRC' | 'CUC' | 'CUP' | 'CVE' | 'CZK' | 'DJF' | 'DKK' | 'DOP' | 'DZD' | 'EEK' | 'EGP' | 'ERN' | 'ETB' | 'EUR' | 'FJD' | 'FKP' | 'GBP' | 'GBX' | 'GEL' | 'GGP' | 'GHS' | 'GIP' | 'GMD' | 'GNF' | 'GTQ' | 'GYD' | 'HKD' | 'HNL' | 'HRK' | 'HTG' | 'HUF' | 'IDR' | 'ILS' | 'IMP' | 'INR' | 'IQD' | 'IRR' | 'ISK' | 'JEP' | 'JMD' | 'JOD' | 'JPY' | 'KES' | 'KGS' | 'KHR' | 'KMF' | 'KPW' | 'KRW' | 'KWD' | 'KYD' | 'KZT' | 'LAK' | 'LBP' | 'LKR' | 'LRD' | 'LSL' | 'LTL' | 'LVL' | 'LYD' | 'MAD' | 'MDL' | 'MGA' | 'MKD' | 'MMK' | 'MNT' | 'MOP' | 'MRO' | 'MRU' | 'MTL' | 'MUR' | 'MVR' | 'MWK' | 'MXN' | 'MYR' | 'MZN' | 'NAD' | 'NGN' | 'NIO' | 'NOK' | 'NPR' | 'NZD' | 'OMR' | 'PAB' | 'PEN' | 'PGK' | 'PHP' | 'PKR' | 'PLN' | 'PYG' | 'QAR' | 'RON' | 'RSD' | 'RUB' | 'RWF' | 'SAR' | 'SBD' | 'SCR' | 'SDG' | 'SEK' | 'SGD' | 'SHP' | 'SKK' | 'SLL' | 'SOS' | 'SRD' | 'SSP' | 'STD' | 'SVC' | 'SYP' | 'SZL' | 'THB' | 'TJS' | 'TMM' | 'TMT' | 'TND' | 'TOP' | 'TRY' | 'TTD' | 'TWD' | 'TZS' | 'UAH' | 'UGX' | 'UYU' | 'UZS' | 'VEF' | 'VES' | 'VND' | 'VUV' | 'WST' | 'XAF' | 'XAG' | 'XAU' | 'XBA' | 'XBB' | 'XBC' | 'XBD' | 'XCD' | 'XDR' | 'XFU' | 'XOF' | 'XPD' | 'XPF' | 'XPT' | 'XTS' | 'YER' | 'ZAR' | 'ZMK' | 'ZMW' | 'ZWD' | 'ZWL' | 'ZWN' | 'ZWR';
 
@@ -143,7 +143,7 @@ interface ErrorMessage {
   message?: string;
 }
 
-const mockInternalAccounts: InternalAccount[] = [
+const mockInternalAccounts: InternalAccount[] =[
   {
     id: 'ia_12345',
     object: 'internal_account',
@@ -155,7 +155,7 @@ const mockInternalAccounts: InternalAccount[] = [
     party_type: 'business',
     name: 'Main Checking USD',
     account_details: [],
-    routing_details: [],
+    routing_details:[],
     connection: {
       id: 'conn_abc',
       object: 'connection',
@@ -183,7 +183,7 @@ const mockInternalAccounts: InternalAccount[] = [
     party_type: 'business',
     name: 'Savings CAD',
     account_details: [],
-    routing_details: [],
+    routing_details:[],
     connection: {
       id: 'conn_def',
       object: 'connection',
@@ -203,7 +203,7 @@ const mockInternalAccounts: InternalAccount[] = [
 ];
 
 const mockBalanceReportsData: Record<string, BalanceReport[]> = {
-  'ia_12345': [
+  'ia_12345':[
     {
       id: 'br_usd_1',
       object: 'balance_report',
@@ -213,14 +213,14 @@ const mockBalanceReportsData: Record<string, BalanceReport[]> = {
       balance_report_type: 'real_time',
       as_of_date: '2024-01-26',
       as_of_time: '14:30:00',
-      balances: [
+      balances:[
         { amount: 1500000, currency: 'USD', balance_type: 'current_available' },
         { amount: 1520000, currency: 'USD', balance_type: 'current_ledger' },
       ],
       internal_account_id: 'ia_12345',
     },
   ],
-  'ia_67890': [
+  'ia_67890':[
     {
       id: 'br_cad_1',
       object: 'balance_report',
@@ -230,7 +230,7 @@ const mockBalanceReportsData: Record<string, BalanceReport[]> = {
       balance_report_type: 'real_time',
       as_of_date: '2024-01-26',
       as_of_time: '14:30:00',
-      balances: [
+      balances:[
         { amount: 500000, currency: 'CAD', balance_type: 'current_available' },
         { amount: 510000, currency: 'CAD', balance_type: 'current_ledger' },
       ],
@@ -245,7 +245,7 @@ const apiClient = {
   },
   listBalanceReports: async (accountId: string, params?: { per_page?: number; balance_report_type?: string }): Promise<{ data: BalanceReport[] }> => {
     return new Promise(resolve => setTimeout(() => {
-      let reports = mockBalanceReportsData[accountId] || [];
+      let reports = mockBalanceReportsData[accountId] ||[];
       if (params?.balance_report_type) {
         reports = reports.filter(report => report.balance_report_type === params.balance_report_type);
       }
@@ -265,7 +265,7 @@ interface AggregatedCurrencyBalance {
 
 const AccountsDashboardView: React.FC = () => {
   const [internalAccounts, setInternalAccounts] = useState<InternalAccount[]>([]);
-  const [accountBalanceReports, setAccountBalanceReports] = useState<Record<string, BalanceReport>>({});
+  const[accountBalanceReports, setAccountBalanceReports] = useState<Record<string, BalanceReport>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -275,13 +275,13 @@ const AccountsDashboardView: React.FC = () => {
         setLoading(true);
         setError(null);
         const accountsResponse = await apiClient.listInternalAccounts();
-        const accounts = accountsResponse.data || [];
+        const accounts = accountsResponse.data ||[];
         setInternalAccounts(accounts);
         const balancesMap: Record<string, BalanceReport> = {};
         const fetchBalancePromises = accounts.map(async (account) => {
           try {
             const res = await apiClient.listBalanceReports(account.id, { per_page: 1, balance_report_type: 'real_time' });
-            if (res.data?.length > 0) balancesMap[account.id] = res.data[0];
+            if (res.data && res.data.length > 0) balancesMap[account.id] = res.data[0];
           } catch (e) {
             console.warn(`Failed to fetch balance for ${account.id}:`, e);
           }
@@ -296,7 +296,7 @@ const AccountsDashboardView: React.FC = () => {
       }
     };
     fetchAccountsAndBalances();
-  }, []);
+  },[]);
 
   const getBalanceAmount = (report: BalanceReport | undefined, type: 'current_available' | 'current_ledger'): number | null => {
     return report?.balances.find(b => b.balance_type === type)?.amount ?? null;
@@ -318,11 +318,12 @@ const AccountsDashboardView: React.FC = () => {
     }));
   }, [internalAccounts, accountBalanceReports]);
 
-  if (loading) return <Box p={4}><Spinner /><Text mt={2}>Loading accounts overview...</Text></Box>;
-  if (error) return <Box p={4}><Alert status="error"><Text>{error}</Text></Alert></Box>;
+  if (loading) return <Box p={4}><GlobalStyles /><Spinner /><Text mt={2}>Loading accounts overview...</Text></Box>;
+  if (error) return <Box p={4}><GlobalStyles /><Alert status="error"><Text>{error}</Text></Alert></Box>;
 
   return (
     <Box p={4} className="accounts-dashboard-view">
+      <GlobalStyles />
       <Heading as="h1" size="xl" mb={6}>Accounts Dashboard</Heading>
       <Card mb={6}>
         <Heading as="h2" size="lg" mb={4}>Total Balances Across Currencies</Heading>
