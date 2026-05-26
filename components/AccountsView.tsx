@@ -218,7 +218,7 @@ const AccountsView: React.FC = () => {
 
   const logAction = useCallback((action: string, details: string, severity: AuditEntry['severity'] = 'low') => {
     const newEntry: AuditEntry = {
-      id: `log-${Math.random().toString(36).substr(2, 9)}`,
+      id: `log-${Math.random().toString(36).slice(2, 11)}`,
       timestamp: new Date().toISOString(),
       action,
       actor: "Authorized User (Admin)",
@@ -262,9 +262,7 @@ const AccountsView: React.FC = () => {
     setIsAiThinking(true);
 
     try {
-      const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || "DEMO_KEY_EXPIRED");
-      const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
-
+      const apiKey = (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || "";
       const prompt = `
         You are the Quantum Financial Sovereign AI. 
         Context: The user is in the Accounts View.
@@ -281,9 +279,9 @@ const AccountsView: React.FC = () => {
         Respond in JSON format: { "message": "your verbal response", "action": "ACTION_TYPE", "params": {} }
       `;
 
-      // Simulation of AI response for demo purposes if key is missing, otherwise use real API
       let result;
-      if (!process.env.GEMINI_API_KEY) {
+      if (!apiKey) {
+        // Simulation of AI response for demo purposes if key is missing
         await new Promise(r => setTimeout(r, 1000));
         result = {
           message: `I've processed your request regarding "${userMsg}". I am initiating the secure protocol now.`,
@@ -291,9 +289,20 @@ const AccountsView: React.FC = () => {
           params: { amount: 1000 }
         };
       } else {
-        const response = await model.generateContent(prompt);
-        const text = response.response.text();
-        result = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+        const genAI = new GoogleGenAI({ apiKey });
+        const response = await genAI.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+        });
+        const text = response.text || "";
+        const startIndex = text.indexOf('{');
+        const endIndex = text.lastIndexOf('}');
+        if (startIndex !== -1 && endIndex !== -1) {
+          const jsonStr = text.substring(startIndex, endIndex + 1);
+          result = JSON.parse(jsonStr);
+        } else {
+          throw new Error("Invalid JSON response from AI");
+        }
       }
 
       setAiMessages(prev => [...prev, { role: 'ai', text: result.message }]);
@@ -325,14 +334,14 @@ const AccountsView: React.FC = () => {
       setSelectedAccount(updatedAccounts.find(a => a.id === selectedAccount.id) || null);
       
       const newTx: Transaction = {
-        id: `tx-${Math.random().toString(36).substr(2, 9)}`,
+        id: `tx-${Math.random().toString(36).slice(2, 11)}`,
         amount: amount,
         date: new Date().toISOString().split('T')[0],
         description: 'Quantum Inbound Liquidity (Stripe)',
         category: 'Transfer',
         type: 'credit',
         status: 'completed',
-        reference: `STRIPE-${Math.random().toString(36).toUpperCase().substr(0, 8)}`
+        reference: `STRIPE-${Math.random().toString(36).toUpperCase().slice(0, 8)}`
       };
       setTransactions(prev => [newTx, ...prev]);
       logAction("Liquidity Inbound", `Successfully processed $${amount} via Stripe Terminal`, "medium");
@@ -340,7 +349,7 @@ const AccountsView: React.FC = () => {
   };
 
   const handleConnectERP = async (provider: string) => {
-    const key = `sk_live_${Math.random().toString(36).substr(2, 24)}`;
+    const key = `sk_live_${Math.random().toString(36).slice(2, 26)}`;
     await vault.store(provider, key);
     const display = await vault.getDisplay(provider);
     
