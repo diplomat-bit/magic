@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 // Type definition for a command log entry
@@ -21,7 +20,6 @@ const commandLogData: CommandLogEntry[] = [
   { id: 8, command: "Find transaction with reference number 'XYZ123'", timestamp: "2 days ago", status: "Completed" },
 ];
 
-
 // SVG Icon Components
 const CheckCircleIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
@@ -36,14 +34,13 @@ const XCircleIcon = () => (
 );
 
 const ClockIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clipRule="evenodd" />
-    </svg>
+  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clipRule="evenodd" />
+  </svg>
 );
 
-
 // Helper to get icon based on status
-const getStatusIcon = (status: CommandLogEntry['status']) => {
+const getStatusConfig = (status: CommandLogEntry['status']) => {
   switch (status) {
     case 'Completed':
       return { Icon: CheckCircleIcon, bgColor: 'bg-green-100 dark:bg-green-900/30' };
@@ -51,8 +48,6 @@ const getStatusIcon = (status: CommandLogEntry['status']) => {
       return { Icon: XCircleIcon, bgColor: 'bg-red-100 dark:bg-red-900/30' };
     case 'Pending':
       return { Icon: ClockIcon, bgColor: 'bg-yellow-100 dark:bg-yellow-900/30' };
-    default:
-      return { Icon: CheckCircleIcon, bgColor: 'bg-gray-100 dark:bg-gray-700' };
   }
 };
 
@@ -67,8 +62,8 @@ const AICommandLog = () => {
       </div>
       <div className="flex-grow overflow-y-auto -mr-4 pr-4">
         <ul className="space-y-4">
-          {commandLogData.map((item, index) => {
-            const { Icon, bgColor } = getStatusIcon(item.status);
+          {commandLogData.map((item) => {
+            const { Icon, bgColor } = getStatusConfig(item.status);
             return (
               <li key={item.id}>
                 <div className="flex items-start space-x-3">
