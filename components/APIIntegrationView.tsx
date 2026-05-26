@@ -43,7 +43,7 @@ const useAsyncAction = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const execute = useCallback(async <T,>(action: () => Promise<T>): Promise<T | undefined> => {
+    const execute = useCallback(async <T extends unknown>(action: () => Promise<T>): Promise<T | undefined> => {
         setIsLoading(true);
         setError(null);
         try {
@@ -531,10 +531,10 @@ const APIIntegrationView: React.FC = () => {
             <Snackbar 
                 open={feedback.open} 
                 autoHideDuration={6000} 
-                onClose={hideFeedback}
+                onClose={() => hideFeedback()}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-                <Alert onClose={hideFeedback} severity={feedback.severity} sx={{ width: '100%' }} variant="filled">
+                <Alert onClose={() => hideFeedback()} severity={feedback.severity} sx={{ width: '100%' }} variant="filled">
                     {feedback.message}
                 </Alert>
             </Snackbar>
