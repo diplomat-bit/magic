@@ -77,12 +77,13 @@ const AIChatAssistant: React.FC<{ geminiApiKey: string | null }> = ({ geminiApiK
         if (geminiApiKey) {
             try {
                 const genAI = new GoogleGenerativeAI(geminiApiKey);
-                const model = genAI.getGenerativeModel({
-                    model: "gemini-2.5-flash",
-                    systemInstruction: "You are GEIN (Global Enterprise Intelligence Network), an AI Business Assistant integrated into an Enterprise Operating System. Your purpose is to help users with API monitoring, financial insights, high-frequency trading, legal compliance, supply chain logistics, HR, workflow automation, and business intelligence. Be concise, professional, and helpful.",
-                });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); // systemInstruction moved to startChat
                 chatSessionRef.current = model.startChat({
                     history: [],
+                    // System instructions are passed as an array of Parts to startChat
+                    systemInstructions: [{
+                        text: "You are GEIN (Global Enterprise Intelligence Network), an AI Business Assistant integrated into an Enterprise Operating System. Your purpose is to help users with API monitoring, financial insights, high-frequency trading, legal compliance, supply chain logistics, HR, workflow automation, and business intelligence. Be concise, professional, and helpful."
+                    }],
                 });
                 setError(null);
             } catch (e: any) {
@@ -113,10 +114,14 @@ const AIChatAssistant: React.FC<{ geminiApiKey: string | null }> = ({ geminiApiK
                 aiResponseText += chunkText;
                 setChatMessages(prev => {
                     const newMessages = [...prev];
-                    const lastMessage = newMessages[newMessages.length - 1];
-                    if (lastMessage && lastMessage.sender === 'ai') {
-                        lastMessage.text = aiResponseText;
-                        lastMessage.timestamp = new Date().toLocaleTimeString();
+                    const lastMessageIndex = newMessages.length - 1;
+                    if (lastMessageIndex >= 0 && newMessages[lastMessageIndex].sender === 'ai') {
+                        // Create a new message object for immutable update
+                        newMessages[lastMessageIndex] = {
+                            ...newMessages[lastMessageIndex],
+                            text: aiResponseText,
+                            timestamp: new Date().toLocaleTimeString(),
+                        };
                     }
                     return newMessages;
                 });
@@ -129,7 +134,7 @@ const AIChatAssistant: React.FC<{ geminiApiKey: string | null }> = ({ geminiApiK
                 const newMessages = [...prev];
                 const lastMessage = newMessages[newMessages.length - 1];
                 if (lastMessage && lastMessage.sender === 'ai' && lastMessage.text === '') {
-                    newMessages.pop();
+                    newMessages.pop(); // Remove the empty AI message if an error occurred before any content was streamed
                 }
                 return newMessages;
             });
@@ -561,7 +566,7 @@ const FinancialOperationsDashboard: React.FC<{ modernTreasuryApiKey: string | nu
                             </ResponsiveContainer>
                         </div>
                         <div className="bg-gray-900 rounded-lg p-4 border border-gray-700 space-y-3">
-                            <h4 className="text-lg font-semibold text-white">AI Forecast Summary</h4>
+                            <h4 className="text-lg font-semibold text-white}>AI Forecast Summary</h4>
                             <p className="text-gray-400 text-sm">
                                 Our AI model predicts a strong financial outlook for the next 12 months, with consistent growth in revenue streams.
                                 Key factors include: increased customer retention, successful product launches, and optimized operational costs.
@@ -1059,11 +1064,12 @@ const HighFrequencyTradingDashboard: React.FC<{ geminiApiKey: string | null }> =
             setMarketData(prev => {
                 const lastPrice = prev.length > 0 ? prev[prev.length - 1].price : 60000;
                 const newPrice = lastPrice + (Math.random() - 0.5) * 100;
+                // Keep the last 100 data points for performance
                 const newData = [...prev.slice(-99), { time: Date.now(), price: newPrice }];
                 return newData;
             });
 
-            if (Math.random() > 0.7) {
+            if (Math.random() > 0.7) { // Simulate trades occasionally
                 setTradeLog(prev => {
                     const newTrade = {
                         time: new Date().toLocaleTimeString(),
@@ -1072,6 +1078,7 @@ const HighFrequencyTradingDashboard: React.FC<{ geminiApiKey: string | null }> =
                         price: 60000 + (Math.random() - 0.5) * 100,
                         size: Math.random() * 2,
                     };
+                    // Keep the last 100 trades
                     return [newTrade, ...prev.slice(0, 99)];
                 });
             }
