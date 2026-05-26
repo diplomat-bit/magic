@@ -139,6 +139,8 @@ const AccountsView: React.FC = () => {
             await new Promise(resolve => setTimeout(resolve, 800)); // Simulate network delay
             const generatedAccounts = generateAccounts(Math.floor(Math.random() * 5) + 2); // Generate 2-6 accounts
             if (generatedAccounts.length === 0) {
+                // This branch is theoretically unreachable due to Math.floor(Math.random() * 5) + 2 always being >= 2
+                // but kept for robustness as a general error handling pattern.
                 throw new Error("No accounts found for this profile.");
             }
             setAccounts(generatedAccounts);
@@ -165,6 +167,9 @@ const AccountsView: React.FC = () => {
                 } finally {
                     setIsLoadingTransactions(false);
                 }
+            } else {
+                // Clear transactions if no account is selected
+                setTransactions([]);
             }
         };
         fetchTransactions();
@@ -172,7 +177,12 @@ const AccountsView: React.FC = () => {
 
     const handleSelectAccount = (accountId: string) => {
         const account = accounts.find(a => a.id === accountId);
-        if (account) setSelectedAccount(account);
+        if (account) {
+            setSelectedAccount(account);
+        } else {
+            // Optionally handle case where accountId is not found (e.g., log error, deselect current)
+            // For now, if not found, it just won't update selectedAccount.
+        }
     };
 
     if (isLoadingAccounts) return <LoadingSpinner text="Loading financial accounts..." />;
@@ -192,7 +202,7 @@ const AccountsView: React.FC = () => {
                 <div className="lg:col-span-1 space-y-4">
                     <div className="bg-gray-800 rounded-xl border border-gray-700 p-4">
                         <h3 className="text-lg font-semibold text-white mb-4">Your Accounts</h3>
-                        <AccountList accounts={accounts} onAccountSelect={handleSelectAccount} />
+                        <AccountList accounts={accounts} onAccountSelect={handleSelectAccount} selectedAccountId={selectedAccount?.id} />
                     </div>
                 </div>
 
@@ -201,6 +211,10 @@ const AccountsView: React.FC = () => {
                     {selectedAccount ? (
                         <>
                             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                                {/* Assuming AccountDetails component takes accountId and customerId for internal logic or simple display.
+                                    If it needs the full account object, the prop should be `account={selectedAccount}`
+                                    and AccountDetails.tsx would need to be updated accordingly.
+                                    Sticking to the original interpretation of props for this file. */}
                                 <AccountDetails accountId={selectedAccount.id} customerId={selectedAccount.customerId} />
                             </div>
                             
