@@ -196,29 +196,31 @@ const processAIRequest = async (prompt: string, context: any) => {
   if (!GEMINI_API_KEY) return "AI Engine Offline: GEMINI_API_KEY missing.";
 
   try {
-    const model = ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: `
-        You are the Quantum Financial AI Co-Pilot. 
-        Context: You are helping a user "Test Drive" a global banking platform.
-        Tone: Elite, Professional, High-Performance. 
-        Story: You are proud of this demo. It was built by a 32-year-old visionary who interpreted cryptic global banking terms to create this "Golden Ticket" experience.
-        Rules: 
-        1. NEVER mention Citibank. 
-        2. Use car metaphors (engine, tires, turbo, cockpit).
-        3. You can trigger actions. If the user wants to create a transaction, wire, or integration, output a JSON block at the end.
-        
-        Current App State: ${JSON.stringify(context)}
-        
-        User Request: ${prompt}
-        
-        If triggering an action, use: @@ACTION:{"type": "CREATE_WIRE", "amount": 500, "recipient": "Tesla Corp"}@@
-      `,
+    const model = ai.getGenerativeModel({
+      model: "gemini-pro", // Changed to gemini-pro for stability, gemini-3-flash-preview might need different access.
     });
 
-    const result = await model;
-    return result.text;
+    const result = await model.generateContent(
+      `You are the Quantum Financial AI Co-Pilot. 
+      Context: You are helping a user "Test Drive" a global banking platform.
+      Tone: Elite, Professional, High-Performance. 
+      Story: You are proud of this demo. It was built by a 32-year-old visionary who interpreted cryptic global banking terms to create this "Golden Ticket" experience.
+      Rules: 
+      1. NEVER mention Citibank. 
+      2. Use car metaphors (engine, tires, turbo, cockpit).
+      3. You can trigger actions. If the user wants to create a transaction, wire, or integration, output a JSON block at the end.
+      
+      Current App State: ${JSON.stringify(context)}
+      
+      User Request: ${prompt}
+      
+      If triggering an action, use: @@ACTION:{"type": "CREATE_WIRE", "amount": 500, "recipient": "Tesla Corp"}@@`
+    );
+    
+    // Correct way to access the text from the response object
+    return result.response.text();
   } catch (e) {
+    console.error("AI engine error:", e);
     return "The AI engine stalled. Please check the fuel (API Key).";
   }
 };
@@ -258,7 +260,7 @@ const AccountStatementGrid: React.FC = () => {
   const [isAuditOpen, setIsAuditOpen] = useState(false);
   const [isWireModalOpen, setIsWireModalOpen] = useState(false);
   const [isIntegrationModalOpen, setIsIntegrationModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(0); // This state isn't currently used, but harmless.
   const [isProcessing, setIsProcessing] = useState(false);
   const [stripeStatus, setStripeStatus] = useState<'IDLE' | 'CONNECTING' | 'ACTIVE'>('IDLE');
 
@@ -267,6 +269,12 @@ const AccountStatementGrid: React.FC = () => {
   const [integrationData, setIntegrationData] = useState({ provider: 'Stripe', key: '' });
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom of chat when messages change or chat opens
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatMessages, isChatOpen]);
+
 
   // --- ACTIONS ---
 
@@ -304,18 +312,24 @@ const AccountStatementGrid: React.FC = () => {
     if (aiResponse.includes('@@ACTION:')) {
       const actionMatch = aiResponse.match(/@@ACTION:(.*?)@@/);
       if (actionMatch) {
-        const action = JSON.parse(actionMatch[1]);
-        if (action.type === 'CREATE_WIRE') {
-          setWireData({ recipient: action.recipient, amount: action.amount.toString(), ref: 'AI-GENERATED', type: 'WIRE' });
-          setIsWireModalOpen(true);
+        try {
+          const action = JSON.parse(actionMatch[1]);
+          if (action.type === 'CREATE_WIRE') {
+            setWireData({ recipient: action.recipient, amount: action.amount.toString(), ref: 'AI-GENERATED', type: 'WIRE' });
+            setIsWireModalOpen(true);
+            logAction("AI_ACTION_TRIGGER", `AI suggested wire to ${action.recipient} for ${action.amount}`, "SUCCESS");
+          }
+        } catch (parseError) {
+          console.error("Failed to parse AI action JSON:", parseError);
+          logAction("AI_ACTION_PARSE_ERROR", `Failed to parse AI action: ${actionMatch[1]}`, "CRITICAL");
         }
-        cleanText = aiResponse.replace(/@@ACTION:.*?@@/, '');
+        cleanText = aiResponse.replace(/@@ACTION:.*?@@/, ''); // Remove action string from AI text
       }
     }
 
     setChatMessages(prev => [...prev, { id: (Date.now() + 1).toString(), sender: 'ai', text: cleanText, timestamp: new Date() }]);
     setIsProcessing(false);
-    logAction("AI_INTERACTION", `User asked: ${chatInput.substring(0, 30)}...`, "SUCCESS");
+    logAction("AI_INTERACTION", `User asked: ${chatInput.substring(0, 50)}...`, "SUCCESS");
   };
 
   const executeWire = () => {
@@ -338,7 +352,7 @@ const AccountStatementGrid: React.FC = () => {
     setIsWireModalOpen(false);
     setWireData({ recipient: '', amount: '', ref: '', type: 'WIRE' });
     
-    // Simulate Fraud Monitoring
+    // Simulate Fraud Monitoring & booking
     setTimeout(() => {
       setRows(prev => prev.map(r => r.id === newTx.id ? { ...r, Sts: 'BOOKED' } : r));
       logAction("FRAUD_MONITOR", `Transaction ${newTx.id} cleared security protocols.`, "SUCCESS");
@@ -359,12 +373,12 @@ const AccountStatementGrid: React.FC = () => {
 
   // --- COLUMNS ---
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<StatementLine>[] = [ // Added type argument to GridColDef
     { 
       field: 'BookgDt', 
       headerName: 'Booking Date', 
       width: 130,
-      valueFormatter: (params) => new Date(params.value).toLocaleDateString()
+      valueFormatter: (params) => new Date(params.value as string).toLocaleDateString() // Cast to string
     },
     { 
       field: 'Merchant', 
@@ -391,7 +405,7 @@ const AccountStatementGrid: React.FC = () => {
           fontFamily: 'Roboto Mono'
         }}>
           {params.row.CdtDbtInd === 'CRDT' ? '+' : '-'}
-          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(params.value)}
+          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(params.value as number)} {/* Cast to number */}
         </Typography>
       )
     },
@@ -401,7 +415,7 @@ const AccountStatementGrid: React.FC = () => {
       width: 120,
       renderCell: (params) => (
         <Chip 
-          label={params.value} 
+          label={params.value as string} // Cast to string
           size="small" 
           variant="outlined"
           color={params.value === 'BOOKED' ? 'success' : 'warning'}
@@ -417,7 +431,7 @@ const AccountStatementGrid: React.FC = () => {
         <Box sx={{ width: '100%' }}>
           <LinearProgress 
             variant="determinate" 
-            value={params.value} 
+            value={params.value as number} // Cast to number
             color={params.value > 70 ? 'error' : params.value > 40 ? 'warning' : 'success'}
             sx={{ height: 6, borderRadius: 3 }}
           />
@@ -615,7 +629,7 @@ const AccountStatementGrid: React.FC = () => {
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={handleSendChat} color="primary"><span>🚀</span></IconButton>
+                        <IconButton onClick={handleSendChat} color="primary" disabled={isProcessing}><span>🚀</span></IconButton>
                       </InputAdornment>
                     )
                   }}
@@ -636,7 +650,7 @@ const AccountStatementGrid: React.FC = () => {
               {auditLogs.map((log) => (
                 <ListItem key={log.id} sx={{ mb: 2, bgcolor: 'rgba(255,255,255,0.02)', borderRadius: 2, flexDirection: 'column', alignItems: 'flex-start' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 1 }}>
-                    <Chip label={log.action} size="small" color={log.status === 'SUCCESS' ? 'primary' : 'error'} />
+                    <Chip label={log.action} size="small" color={log.status === 'SUCCESS' ? 'primary' : log.status === 'WARNING' ? 'warning' : 'error'} /> {/* Added dynamic chip color */}
                     <Typography variant="caption" color="text.secondary">{new Date(log.timestamp).toLocaleString()}</Typography>
                   </Box>
                   <Typography variant="body2">{log.details}</Typography>
