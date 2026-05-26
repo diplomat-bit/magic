@@ -1,23 +1,18 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
   AlertTriangle, 
   CheckCircle, 
   Search, 
   Plus, 
-  MessageSquare, 
-  Activity, 
   Lock, 
   Database, 
   Cpu, 
   Zap, 
   Globe, 
   TrendingUp, 
-  FileText, 
   Settings, 
   CreditCard,
-  Terminal,
-  Eye,
   RefreshCw,
   X,
   Send,
@@ -35,12 +30,32 @@ import { GoogleGenAI } from "@google/genai";
  * simulations, and robust audit logging.
  */
 
+// --- TYPES ---
+interface AIRisk {
+  id: string;
+  title: string;
+  category: 'Bias' | 'Privacy' | 'Security' | 'Hallucination' | 'Compliance';
+  severity: 'Critical' | 'High' | 'Medium' | 'Low';
+  status: 'Open' | 'Mitigating' | 'Resolved';
+  owner: string;
+  lastUpdated: string;
+  description: string;
+}
+
+interface AuditEntry {
+  timestamp: string;
+  action: string;
+  details: any;
+  id: string;
+  integrity: string;
+}
+
 // --- SECURE INTERNAL STORAGE (HOMOMORPHIC SIMULATION) ---
 // This storage exists only in the app's memory space, encrypted.
 class SecureAppVault {
   private static instance: SecureAppVault;
   private vault: Map<string, string>;
-  private auditTrail: any[];
+  private auditTrail: AuditEntry[];
 
   private constructor() {
     this.vault = new Map();
@@ -61,7 +76,9 @@ class SecureAppVault {
 
   private decrypt(cipher: string): string {
     const decoded = atob(cipher);
-    return decoded.replace(/^QF_SECURE_/, '').split('_')[0];
+    const content = decoded.replace(/^QF_SECURE_/, '');
+    const lastUnderscoreIndex = content.lastIndexOf('_');
+    return lastUnderscoreIndex !== -1 ? content.substring(0, lastUnderscoreIndex) : content;
   }
 
   public storeSecret(key: string, value: string) {
@@ -78,7 +95,7 @@ class SecureAppVault {
   }
 
   public logAudit(action: string, details: any) {
-    const entry = {
+    const entry: AuditEntry = {
       timestamp: new Date().toISOString(),
       action,
       details,
@@ -89,29 +106,17 @@ class SecureAppVault {
     console.log(`[AUDIT LOG]: ${action}`, entry);
   }
 
-  public getAuditLogs() {
+  public getAuditLogs(): AuditEntry[] {
     return [...this.auditTrail].reverse();
   }
 }
 
 const vault = SecureAppVault.getInstance();
 
-// --- TYPES ---
-interface AIRisk {
-  id: string;
-  title: string;
-  category: 'Bias' | 'Privacy' | 'Security' | 'Hallucination' | 'Compliance';
-  severity: 'Critical' | 'High' | 'Medium' | 'Low';
-  status: 'Open' | 'Mitigating' | 'Resolved';
-  owner: string;
-  lastUpdated: string;
-  description: string;
-}
-
 // --- UI COMPONENTS ---
 
 const Card: React.FC<{ title: string; children: React.ReactNode; className?: string }> = ({ title, children, className }) => (
-  <div className={`bg-[#0a0a0c] border border-white/10 rounded-xl overflow-hidden shadow-2xl ${className}`}>
+  <div className={`bg-[#0a0a0c] border border-white/10 rounded-xl overflow-hidden shadow-2xl ${className || ''}`}>
     <div className="px-6 py-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
       <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">{title}</h3>
       <div className="flex space-x-1">
@@ -125,7 +130,7 @@ const Card: React.FC<{ title: string; children: React.ReactNode; className?: str
 );
 
 const Badge: React.FC<{ type: string }> = ({ type }) => {
-  const colors: any = {
+  const colors: Record<string, string> = {
     Critical: 'bg-red-500/10 text-red-500 border-red-500/20',
     High: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
     Medium: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
@@ -149,17 +154,23 @@ const AIRiskRegistryView: React.FC = () => {
     { id: 'R-1026', title: 'Prompt Injection Vulnerability', category: 'Security', severity: 'High', status: 'Open', owner: 'AppSec', lastUpdated: '2023-10-25', description: 'External facing chatbot susceptible to system prompt overrides.' },
   ]);
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'ai'; content: string }[]>([
     { role: 'ai', content: 'Welcome to Quantum Financial AI Assistant. I can help you register risks, analyze threats, or manage your secure vault. How can I assist your "Test Drive" today?' }
   ]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [auditLogs, setAuditLogs] = useState<any[]>([]);
+  const [auditLogs, setAuditLogs] = useState<AuditEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Form Fields for Register Modal
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalCategory, setModalCategory] = useState<AIRisk['category']>('Security');
+  const [modalSeverity, setModalSeverity] = useState<AIRisk['severity']>('Medium');
+  const [modalDescription, setModalDescription] = useState('');
+
   // Stripe Simulation State
+  const [budget, setBudget] = useState(124500.00);
   const [isPaying, setIsPaying] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
@@ -169,6 +180,31 @@ const AIRiskRegistryView: React.FC = () => {
     setAuditLogs(vault.getAuditLogs());
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory, risks]);
+
+  const openRegisterModal = () => {
+    setModalTitle('');
+    setModalCategory('Security');
+    setModalSeverity('Medium');
+    setModalDescription('');
+    setIsModalOpen(true);
+  };
+
+  const handleManualRegister = () => {
+    if (!modalTitle.trim()) return;
+    const newRisk: AIRisk = {
+      id: `R-${Math.floor(Math.random() * 9000) + 1000}`,
+      title: modalTitle,
+      category: modalCategory,
+      severity: modalSeverity,
+      status: 'Open',
+      owner: 'Manual Entry',
+      lastUpdated: new Date().toISOString().split('T')[0],
+      description: modalDescription || 'No description provided.'
+    };
+    setRisks(prev => [newRisk, ...prev]);
+    vault.logAudit('MANUAL_RISK_CREATED', { id: newRisk.id, title: newRisk.title });
+    setIsModalOpen(false);
+  };
 
   // --- AI LOGIC ---
   const handleAIChat = async () => {
@@ -180,10 +216,7 @@ const AIRiskRegistryView: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      // Using the requested GEMINI_API_KEY from environment/secrets
-      const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || 'DEMO_KEY_MOCK');
-      const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
-
+      const apiKey = typeof process !== 'undefined' && process.env ? process.env.GEMINI_API_KEY : undefined;
       const prompt = `
         You are the Quantum Financial AI Risk Assistant. 
         Context: This is a high-performance business demo for an elite financial institution.
@@ -197,8 +230,22 @@ const AIRiskRegistryView: React.FC = () => {
         Keep the tone "Golden Ticket" - high polish, no pressure.
       `;
 
-      const result = await model.generateContent(prompt);
-      const responseText = result.response.text();
+      let responseText = '';
+
+      try {
+        const genAI = new GoogleGenAI({ apiKey: apiKey || 'DEMO_KEY_MOCK' });
+        const result = await genAI.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+        });
+        responseText = result.text || '';
+      } catch (sdkError) {
+        // Fallback supporting standard or legacy SDK initializations
+        const genAI = new (GoogleGenAI as any)(apiKey || 'DEMO_KEY_MOCK');
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const result = await model.generateContent(prompt);
+        responseText = typeof result.response.text === 'function' ? result.response.text() : result.response.text;
+      }
 
       // Check for structured actions
       if (responseText.includes('CREATE_RISK')) {
@@ -209,8 +256,8 @@ const AIRiskRegistryView: React.FC = () => {
             const newRisk: AIRisk = {
               id: `R-${Math.floor(Math.random() * 9000) + 1000}`,
               title: actionData.title || 'New AI Risk',
-              category: actionData.category || 'Security',
-              severity: actionData.severity || 'Medium',
+              category: (actionData.category as AIRisk['category']) || 'Security',
+              severity: (actionData.severity as AIRisk['severity']) || 'Medium',
               status: 'Open',
               owner: 'AI Generated',
               lastUpdated: new Date().toISOString().split('T')[0],
@@ -227,7 +274,7 @@ const AIRiskRegistryView: React.FC = () => {
         setChatHistory(prev => [...prev, { role: 'ai', content: responseText }]);
       }
     } catch (error) {
-      // Fallback for demo if API key is missing
+      // Fallback for demo if API key fails or is missing
       setChatHistory(prev => [...prev, { role: 'ai', content: "I've analyzed your request. In this demo environment, I'm simulating the response. I can help you 'kick the tires' on our risk engine. Would you like me to generate a sample vulnerability report?" }]);
     } finally {
       setIsProcessing(false);
@@ -242,6 +289,7 @@ const AIRiskRegistryView: React.FC = () => {
     setTimeout(() => {
       setIsPaying(false);
       setPaymentSuccess(true);
+      setBudget(prev => prev + 5000);
       vault.logAudit('PAYMENT_SUCCESS', { transactionId: 'ch_3N' + Math.random().toString(36).substring(7) });
       setTimeout(() => setPaymentSuccess(false), 3000);
     }, 2000);
@@ -274,13 +322,13 @@ const AIRiskRegistryView: React.FC = () => {
 
         <div className="flex items-center space-x-3">
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={openRegisterModal}
             className="flex items-center space-x-2 bg-white text-black px-5 py-2.5 rounded-full font-bold text-sm hover:bg-cyan-400 transition-all active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
           >
             <Plus className="w-4 h-4" />
             <span>Register Risk</span>
           </button>
-          <button className="p-2.5 border border-white/10 rounded-full hover:bg-white/5 transition-colors">
+          <button className="p-2.5 border border-white/10 rounded-full hover:bg-white/5 transition-colors" aria-label="Settings">
             <Settings className="w-5 h-5 text-gray-400" />
           </button>
         </div>
@@ -354,7 +402,7 @@ const AIRiskRegistryView: React.FC = () => {
                         <Badge type={risk.status} />
                       </td>
                       <td className="py-4 align-top text-right pr-2">
-                        <button className="text-gray-500 hover:text-white transition-colors">
+                        <button className="text-gray-500 hover:text-white transition-colors" aria-label={`View details for ${risk.id}`}>
                           <ChevronRight className="w-5 h-5" />
                         </button>
                       </td>
@@ -448,12 +496,13 @@ const AIRiskRegistryView: React.FC = () => {
                 <button 
                   onClick={handleAIChat}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-cyan-500 text-black rounded-lg hover:bg-cyan-400 transition-colors"
+                  aria-label="Send message"
                 >
                   <Send className="w-3 h-3" />
                 </button>
               </div>
               <p className="text-[9px] text-gray-600 mt-2 text-center uppercase tracking-tighter">
-                Powered by Gemini-3-Flash-Preview • Quantum Secure
+                Powered by Gemini-2.5-Flash • Quantum Secure
               </p>
             </div>
           </div>
@@ -465,7 +514,7 @@ const AIRiskRegistryView: React.FC = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Available Budget</p>
-                    <p className="text-2xl font-black">$124,500.00</p>
+                    <p className="text-2xl font-black">${budget.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                   </div>
                   <CreditCard className="w-6 h-6 text-white/20" />
                 </div>
@@ -522,38 +571,58 @@ const AIRiskRegistryView: React.FC = () => {
           <div className="bg-[#0a0a0c] border border-white/10 w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/5">
               <h2 className="text-xl font-black tracking-tight">REGISTER NEW RISK</h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white">
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 hover:text-white" aria-label="Close modal">
                 <X className="w-6 h-6" />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1.5">Risk Title</label>
-                <input type="text" className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none" placeholder="e.g. LLM Hallucination in Financial Advice" />
+                <input 
+                  type="text" 
+                  value={modalTitle}
+                  onChange={(e) => setModalTitle(e.target.value)}
+                  className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none" 
+                  placeholder="e.g. LLM Hallucination in Financial Advice" 
+                />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1.5">Category</label>
-                  <select className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none appearance-none">
-                    <option>Security</option>
-                    <option>Privacy</option>
-                    <option>Bias</option>
-                    <option>Compliance</option>
+                  <select 
+                    value={modalCategory}
+                    onChange={(e) => setModalCategory(e.target.value as AIRisk['category'])}
+                    className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none appearance-none"
+                  >
+                    <option value="Security">Security</option>
+                    <option value="Privacy">Privacy</option>
+                    <option value="Bias">Bias</option>
+                    <option value="Compliance">Compliance</option>
+                    <option value="Hallucination">Hallucination</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1.5">Severity</label>
-                  <select className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none appearance-none">
-                    <option>Low</option>
-                    <option>Medium</option>
-                    <option>High</option>
-                    <option>Critical</option>
+                  <select 
+                    value={modalSeverity}
+                    onChange={(e) => setModalSeverity(e.target.value as AIRisk['severity'])}
+                    className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none appearance-none"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
                   </select>
                 </div>
               </div>
               <div>
                 <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1.5">Description</label>
-                <textarea className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none h-24" placeholder="Describe the potential impact and threat vector..." />
+                <textarea 
+                  value={modalDescription}
+                  onChange={(e) => setModalDescription(e.target.value)}
+                  className="w-full bg-black border border-white/10 rounded-lg p-3 text-sm focus:border-cyan-500 outline-none h-24" 
+                  placeholder="Describe the potential impact and threat vector..." 
+                />
               </div>
               <div className="p-4 bg-cyan-500/5 border border-cyan-500/20 rounded-xl flex items-start space-x-3">
                 <Lock className="w-4 h-4 text-cyan-500 mt-0.5" />
@@ -565,10 +634,7 @@ const AIRiskRegistryView: React.FC = () => {
             <div className="p-6 bg-white/5 border-t border-white/5 flex justify-end space-x-3">
               <button onClick={() => setIsModalOpen(false)} className="px-6 py-2 text-sm font-bold text-gray-400 hover:text-white transition-colors">Cancel</button>
               <button 
-                onClick={() => {
-                  setIsModalOpen(false);
-                  vault.logAudit('MANUAL_RISK_CREATED', { title: 'Manual Entry' });
-                }}
+                onClick={handleManualRegister}
                 className="px-6 py-2 bg-white text-black rounded-full text-sm font-bold hover:bg-cyan-400 transition-all"
               >
                 Confirm Registration
