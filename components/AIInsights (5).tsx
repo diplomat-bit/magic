@@ -1,4 +1,3 @@
-```typescript
 import React, { useContext, useState, useMemo } from 'react';
 import Card from './Card';
 import type { AIInsight } from '../types';
@@ -23,6 +22,7 @@ interface EnhancedAIInsight extends AIInsight {
         targetPool?: string;
     };
     tags: string[];
+    chartData?: { name: string; value: number }[];
     // --- GEIN (Generative Edge & Intelligence Nexus) Implementation ---
     geinFactor: number; // Proprietary metric for insight quality and uniqueness.
     correlationId: string; // Links related insights across different models/timeframes.
@@ -57,17 +57,20 @@ const CloseIcon = () => (
 
 // --- Enhanced Urgency Indicator with Labels ---
 
-const UrgencyIndicator: React.FC<{ urgency: 'low' | 'medium' | 'high' }> = ({ urgency }) => {
+const UrgencyIndicator: React.FC<{ urgency: string | undefined }> = ({ urgency }) => {
     const urgencyConfig = useMemo(() => ({
         low: { class: 'bg-blue-500', label: 'Low' },
         medium: { class: 'bg-yellow-500', label: 'Medium' },
         high: { class: 'bg-red-500', label: 'High' },
     }), []);
+
+    const safeUrgency = (urgency && ['low', 'medium', 'high'].includes(urgency) ? urgency : 'low') as 'low' | 'medium' | 'high';
+    const config = urgencyConfig[safeUrgency];
     
     return (
         <div className="absolute top-3 right-3 flex items-center text-xs font-semibold">
-            <span className={`h-2.5 w-2.5 rounded-full ${urgencyConfig[urgency].class} mr-2`}></span>
-            <span className="text-gray-400">{urgencyConfig[urgency].label} Urgency</span>
+            <span className={`h-2.5 w-2.5 rounded-full ${config.class} mr-2`}></span>
+            <span className="text-gray-400">{config.label} Urgency</span>
         </div>
     );
 };
@@ -96,7 +99,7 @@ const ActionModal: React.FC<{ insight: EnhancedAIInsight; onClose: () => void }>
                         <p className="text-sm text-gray-400 mb-4">Adjust allocation from {insight.details?.currentAllocation}% to {insight.details?.suggestedAllocation}%. This is a high-conviction trade based on predictive market analytics.</p>
                         <div className="space-y-2">
                             <label htmlFor="allocation" className="block text-sm font-medium text-gray-300">New Allocation (%)</label>
-                            <input type="range" id="allocation" min="0" max="100" defaultValue={insight.details?.suggestedAllocation} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
+                            <input type="range" id="allocation" min="0" max="100" defaultValue={insight.details?.suggestedAllocation ?? 50} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
                         </div>
                     </>
                 );
@@ -107,7 +110,7 @@ const ActionModal: React.FC<{ insight: EnhancedAIInsight; onClose: () => void }>
                         <p className="text-sm text-gray-400 mb-4">Current Price: ${insight.details?.currentPrice?.toFixed(2)}. The AI suggests a new stop-loss to mitigate downside risk from volatility spikes.</p>
                         <div className="space-y-2">
                             <label htmlFor="stoploss" className="block text-sm font-medium text-gray-300">Stop-Loss Price ($)</label>
-                            <input type="number" id="stoploss" defaultValue={insight.details?.suggestedStopLoss} className="w-full bg-gray-900 border border-gray-600 rounded-md p-2 text-gray-100 focus:ring-cyan-500 focus:border-cyan-500" />
+                            <input type="number" id="stoploss" defaultValue={insight.details?.suggestedStopLoss ?? 0} className="w-full bg-gray-900 border border-gray-600 rounded-md p-2 text-gray-100 focus:ring-cyan-500 focus:border-cyan-500" />
                         </div>
                     </>
                 );
@@ -118,7 +121,7 @@ const ActionModal: React.FC<{ insight: EnhancedAIInsight; onClose: () => void }>
                         <p className="text-sm text-gray-400 mb-4">Provide liquidity to the {insight.details?.targetPool} pool to capture yield. AI predicts favorable fee generation over the next 24 hours.</p>
                         <div className="space-y-2">
                             <label htmlFor="lp_allocation" className="block text-sm font-medium text-gray-300">Portfolio Allocation for LP (%)</label>
-                            <input type="number" id="lp_allocation" defaultValue={insight.details?.suggestedAllocation} className="w-full bg-gray-900 border border-gray-600 rounded-md p-2 text-gray-100 focus:ring-cyan-500 focus:border-cyan-500" />
+                            <input type="number" id="lp_allocation" defaultValue={insight.details?.suggestedAllocation ?? 0} className="w-full bg-gray-900 border border-gray-600 rounded-md p-2 text-gray-100 focus:ring-cyan-500 focus:border-cyan-500" />
                         </div>
                     </>
                 );
@@ -234,7 +237,11 @@ const InsightCard: React.FC<{ insight: EnhancedAIInsight; onAction: (insight: En
                         <BarChart data={insight.chartData} layout="vertical" margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                             <XAxis type="number" hide />
                             <YAxis type="category" dataKey="name" axisLine={false} tickLine={false} fontSize={12} stroke="#9ca3af" width={90} style={{ textTransform: 'capitalize' }} />
-                            <Tooltip cursor={{ fill: 'rgba(100,116,139,0.15)' }} contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', borderColor: '#374151', fontSize: '12px', borderRadius: '0.5rem' }} formatter={(value: number, name: string) => [`$${value.toFixed(2)}`, name.charAt(0).toUpperCase() + name.slice(1)]} labelFormatter={(label) => <span className="font-bold capitalize">{label}</span>} />
+                            <Tooltip cursor={{ fill: 'rgba(100,116,139,0.15)' }} contentStyle={{ backgroundColor: 'rgba(17, 24, 39, 0.9)', borderColor: '#374151', fontSize: '12px', borderRadius: '0.5rem' }} formatter={(value: any, name: any) => {
+                                const nameStr = typeof name === 'string' ? name : '';
+                                const numVal = typeof value === 'number' ? value : parseFloat(value) || 0;
+                                return [`$${numVal.toFixed(2)}`, nameStr ? nameStr.charAt(0).toUpperCase() + nameStr.slice(1) : ''];
+                            }} labelFormatter={(label) => <span className="font-bold capitalize">{label}</span>} />
                             <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={14}>{insight.chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#06b6d4' : '#22d3ee'} />)}</Bar>
                         </BarChart>
                     </ResponsiveContainer>
@@ -267,8 +274,8 @@ const AIInsights: React.FC = () => {
             actionable: [true, false, true, true][index % 4] || false,
             geinFactor: parseFloat((Math.random() * (1.5 - 0.8) + 0.8).toFixed(2)),
             correlationId: `corr-${(12345 * (index + 1)).toString(16)}`,
-            sourceModel: ['Gemini-3.0-Ultra', 'Athena-HFT-v2', 'Prometheus-Quant-v4.1'][index % 3],
-            timeToLive: [3600, 900, 14400][index % 3],
+            sourceModel: ['Gemini-3.0-Ultra', 'Athena-HFT-v2', 'Prometheus-Quant-v4.1'][index % 3] || 'Gemini-3.0-Ultra',
+            timeToLive: [3600, 900, 14400][index % 3] || 3600,
             riskAnalysis: {
                 volatilityIndex: parseFloat((Math.random() * (0.8 - 0.2) + 0.2).toFixed(3)),
                 sharpeRatio: parseFloat((Math.random() * (2.5 - 0.5) + 0.5).toFixed(2)),
@@ -285,8 +292,8 @@ const AIInsights: React.FC = () => {
             ],
         };
 
-        const actionType = ['rebalance_portfolio', undefined, 'set_stop_loss', 'liquidity_provision'][index % 4];
-        let details;
+        const actionType = ['rebalance_portfolio', undefined, 'set_stop_loss', 'liquidity_provision'][index % 4] as EnhancedAIInsight['actionType'];
+        let details: EnhancedAIInsight['details'] = undefined;
         switch (actionType) {
             case 'rebalance_portfolio': details = { asset: 'TECH', currentAllocation: 25, suggestedAllocation: 35 }; break;
             case 'set_stop_loss': details = { asset: 'CRYPTO', currentPrice: 45000, suggestedStopLoss: 42500 }; break;
@@ -327,4 +334,3 @@ const AIInsights: React.FC = () => {
 };
 
 export default AIInsights;
-```
