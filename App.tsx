@@ -226,7 +226,7 @@ const MonetizationOverlay = () => {
       <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
       <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Sovereign Balance:</span>
       <span className="text-cyan-400 font-mono text-lg font-bold tracking-tighter">
-        {sovereignCredits.toLocaleString()} SC
+        {typeof sovereignCredits === 'number' ? sovereignCredits.toLocaleString() : '0'} SC
       </span>
     </div>
   );
@@ -238,7 +238,9 @@ const SAppLayout = () => {
   const authContext = useContext(AuthContext);
 
   useEffect(() => {
-    datadogLogs.logger.info('App View Loaded', { name: 'SovereignNexus', id: 'init_view' });
+    if (datadogLogs && datadogLogs.logger) {
+      datadogLogs.logger.info('App View Loaded', { name: 'SovereignNexus', id: 'init_view' });
+    }
   }, []);
 
   if (!dataContext || !authContext) return null;
