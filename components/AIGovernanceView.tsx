@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Shield, 
   Cpu, 
   Activity, 
   Lock, 
   MessageSquare, 
-  Terminal, 
   Zap, 
   Globe, 
   Database, 
@@ -17,13 +16,11 @@ import {
   CreditCard,
   Search,
   Settings,
-  BarChart3,
   FileText,
   ChevronRight,
   Plus,
   X,
   RefreshCw,
-  LockIcon,
   Fingerprint,
   Scale
 } from 'lucide-react';
@@ -72,11 +69,11 @@ interface ChatMessage {
   timestamp: Date;
 }
 
-interface SecureKey {
-  id: string;
-  label: string;
-  encryptedValue: string;
-  createdAt: string;
+interface StatCardProps {
+  title: string;
+  value: string | number;
+  icon: React.ComponentType<any>;
+  color: string;
 }
 
 // --- SECURE INTERNAL STORAGE (HOMOMORPHIC SIMULATION) ---
@@ -86,16 +83,26 @@ const QuantumVault = (() => {
   const _key = "QUANTUM_FINANCIAL_INTERNAL_SECRET_2024";
 
   const xorEncrypt = (data: string): string => {
-    return btoa(data.split('').map((char, i) => 
-      String.fromCharCode(char.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
-    ).join(''));
+    if (typeof window === 'undefined') return '';
+    try {
+      return window.btoa(data.split('').map((char, i) => 
+        String.fromCharCode(char.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
+      ).join(''));
+    } catch {
+      return '';
+    }
   };
 
   const xorDecrypt = (cipher: string): string => {
-    const decoded = atob(cipher);
-    return decoded.split('').map((char, i) => 
-      String.fromCharCode(char.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
-    ).join('');
+    if (typeof window === 'undefined') return '';
+    try {
+      const decoded = window.atob(cipher);
+      return decoded.split('').map((char, i) => 
+        String.fromCharCode(char.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
+      ).join('');
+    } catch {
+      return '';
+    }
   };
 
   return {
@@ -111,8 +118,8 @@ const QuantumVault = (() => {
     listKeys: () => Array.from(_store.keys()),
     // Simulated Homomorphic Operation: Add values without decrypting (demo logic)
     homomorphicAdd: (id1: string, id2: string) => {
-      const v1 = parseFloat(xorDecrypt(_store.get(id1) || "0"));
-      const v2 = parseFloat(xorDecrypt(_store.get(id2) || "0"));
+      const v1 = parseFloat(xorDecrypt(_store.get(id1) || "0") || "0");
+      const v2 = parseFloat(xorDecrypt(_store.get(id2) || "0") || "0");
       return xorEncrypt((v1 + v2).toString());
     }
   };
@@ -145,14 +152,15 @@ const AIGovernanceView: React.FC = () => {
   // --- UTILITIES ---
 
   const logAction = useCallback((action: string, details: string, severity: AuditEntry['severity'] = 'Low') => {
+    const randomHash = typeof window !== 'undefined' ? window.btoa(Math.random().toString()) : '';
     const newEntry: AuditEntry = {
-      id: `LOG-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      id: `LOG-${Math.random().toString(36).slice(2, 11).toUpperCase()}`,
       timestamp: new Date().toISOString(),
       action,
       actor: 'System Administrator',
       severity,
       details,
-      hash: btoa(Math.random().toString()) // Simulated blockchain hash
+      hash: randomHash // Simulated blockchain hash
     };
     setAuditLogs(prev => [newEntry, ...prev].slice(0, 100));
   }, []);
@@ -176,9 +184,12 @@ const AIGovernanceView: React.FC = () => {
     setIsProcessing(true);
 
     try {
-      // Initialize AI with the provided secret key
-      const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-      const model = genAI.models.get("gemini-3-flash-preview");
+      // Initialize AI with safe access to environment variables
+      const apiKey = (typeof process !== 'undefined' && process.env) 
+        ? (process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "") 
+        : "";
+
+      const genAI = new GoogleGenAI({ apiKey });
 
       const systemPrompt = `
         You are the Quantum Financial AI Governance Co-Pilot. 
@@ -192,7 +203,8 @@ const AIGovernanceView: React.FC = () => {
         Always maintain the "Golden Ticket" tone.
       `;
 
-      const result = await model.generateContent({
+      const result = await genAI.models.generateContent({
+        model: "gemini-2.5-flash",
         contents: [
           { role: 'user', parts: [{ text: systemPrompt + "\n\nUser Request: " + userInput }] }
         ]
@@ -200,24 +212,28 @@ const AIGovernanceView: React.FC = () => {
 
       const responseText = result.text || "I apologize, I am experiencing a momentary neural desync. How else can I assist?";
       
-      // Parse commands
+      // Parse commands safely
       if (responseText.includes('CREATE_MODEL:')) {
         const match = responseText.match(/CREATE_MODEL:\s*({.*?})/);
         if (match) {
-          const data = JSON.parse(match[1]);
-          const newModel: AIModel = {
-            id: `m${Date.now()}`,
-            name: data.name || 'New Model',
-            version: data.version || '1.0.0',
-            status: 'Testing',
-            riskScore: 10,
-            biasIndex: 0.05,
-            lastAudit: new Date().toISOString().split('T')[0],
-            owner: data.owner || 'AI Lab',
-            deployment: 'Cloud'
-          };
-          setModels(prev => [...prev, newModel]);
-          logAction('AI Model Creation', `Model ${newModel.name} created via Co-Pilot.`, 'Medium');
+          try {
+            const data = JSON.parse(match[1]);
+            const newModel: AIModel = {
+              id: `m${Date.now()}`,
+              name: data.name || 'New Model',
+              version: data.version || '1.0.0',
+              status: 'Testing',
+              riskScore: 10,
+              biasIndex: 0.05,
+              lastAudit: new Date().toISOString().split('T')[0],
+              owner: data.owner || 'AI Lab',
+              deployment: 'Cloud'
+            };
+            setModels(prev => [...prev, newModel]);
+            logAction('AI Model Creation', `Model ${newModel.name} created via Co-Pilot.`, 'Medium');
+          } catch (jsonErr) {
+            console.error("Failed to parse model creation JSON:", jsonErr);
+          }
         }
       }
 
@@ -249,14 +265,14 @@ const AIGovernanceView: React.FC = () => {
     setTimeout(() => {
       setIsProcessing(false);
       setShowStripeModal(false);
-      logAction('Payment Successful', `Subscription upgraded to ${plan}. Transaction: TXN_${Math.random().toString(36).toUpperCase()}`, 'Medium');
+      logAction('Payment Successful', `Subscription upgraded to ${plan}. Transaction: TXN_${Math.random().toString(36).toUpperCase().slice(2, 10)}`, 'Medium');
       alert(`Success! Your Quantum Financial account has been upgraded to ${plan}.`);
     }, 2000);
   };
 
   // --- UI COMPONENTS ---
 
-  const StatCard = ({ title, value, icon: Icon, color }: any) => (
+  const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color }) => (
     <div className="bg-[#111827] border border-gray-800 p-6 rounded-xl hover:border-blue-500/50 transition-all group">
       <div className="flex justify-between items-start">
         <div>
@@ -546,7 +562,7 @@ const AIGovernanceView: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-[#111827] border border-gray-800 rounded-2xl p-8">
               <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6">
-                <LockIcon className="w-8 h-8 text-purple-500" />
+                <Lock className="w-8 h-8 text-purple-500" />
               </div>
               <h3 className="text-2xl font-bold mb-4">Quantum Vault</h3>
               <p className="text-gray-400 mb-8 leading-relaxed">
@@ -671,7 +687,7 @@ const AIGovernanceView: React.FC = () => {
                   type="text"
                   value={userInput}
                   onChange={(e) => setUserInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAIChat()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAIChat()}
                   placeholder="Ask the Co-Pilot..."
                   className="w-full bg-gray-900 border border-gray-700 rounded-xl pl-4 pr-12 py-3 text-sm focus:border-blue-500 outline-none transition-all"
                 />
@@ -803,7 +819,7 @@ const AIGovernanceView: React.FC = () => {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-white">{keyName}</p>
-                        <p className="text-[10px] text-gray-500 font-mono">ID: {Math.random().toString(16).substr(2, 8)}</p>
+                        <p className="text-[10px] text-gray-500 font-mono">ID: {Math.random().toString(16).slice(2, 10)}</p>
                       </div>
                     </div>
                     <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
