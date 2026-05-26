@@ -145,13 +145,13 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ customerId, accountId }
 
   // -- MEMOIZED DATA --
   const account = useMemo(() => {
-    return context?.linkedAccounts.find(a => a.id === accountId) || context?.linkedAccounts[0];
+    return context?.linkedAccounts?.find(a => a.id === accountId) || context?.linkedAccounts?.[0];
   }, [context, accountId]);
 
   // -- AUDIT LOGGING --
   const logAction = useCallback((action: string, severity: AuditEntry['severity'] = 'INFO', metadata: any = {}) => {
     const entry: AuditEntry = {
-      id: `LOG-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `LOG-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       timestamp: new Date().toISOString(),
       action,
       actor: 'SYSTEM_USER_01',
@@ -214,9 +214,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ customerId, accountId }
     setIsAiLoading(true);
 
     try {
-        // Using the requested GoogleGenAI package with Vercel secrets
-        const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY || 'DEMO_MODE_KEY');
-        const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+        const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'DEMO_MODE_KEY' });
 
         const systemContext = `
             You are the "Quantum Financial Nexus AI Pilot". 
@@ -238,9 +236,11 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ customerId, accountId }
             If the user wants to pay or create something, include the action tag in your response.
         `;
 
-        const result = await model.generateContent([systemContext, input]);
-        const response = await result.response;
-        const text = response.text();
+        const response = await genAI.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: `${systemContext}\n\nUser Input: ${input}`
+        });
+        const text = response.text || '';
 
         const aiMsg: ChatMessage = {
             id: (Date.now() + 1).toString(),
