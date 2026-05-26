@@ -4,7 +4,7 @@ import { DataContext } from '../context/DataContext';
 import Card from './Card';
 
 const UrgencyIndicator: React.FC<{ urgency: 'low' | 'medium' | 'high' }> = ({ urgency }) => {
-    const colors = {
+    const colors: Record<'low' | 'medium' | 'high', string> = {
         low: 'bg-cyan-500',
         medium: 'bg-yellow-500',
         high: 'bg-red-500',
@@ -14,21 +14,24 @@ const UrgencyIndicator: React.FC<{ urgency: 'low' | 'medium' | 'high' }> = ({ ur
 
 const AIInsights: React.FC = () => {
     const context = useContext(DataContext);
-    if (!context) return <div>Loading...</div>;
+    
+    if (!context) {
+        return null;
+    }
 
     const { aiInsights, isInsightsLoading, generateDashboardInsights } = context;
     
     useEffect(() => {
-        if (aiInsights.length === 0) {
+        if (aiInsights && aiInsights.length === 0 && !isInsightsLoading) {
             generateDashboardInsights();
         }
-    }, []);
+    }, [aiInsights, isInsightsLoading, generateDashboardInsights]);
 
     return (
         <Card title="AI Insights">
             {isInsightsLoading ? (
                 <div className="text-center text-gray-400">Quantum is analyzing your data...</div>
-            ) : (
+            ) : aiInsights && aiInsights.length > 0 ? (
                 <ul className="space-y-3">
                     {aiInsights.map(insight => (
                         <li key={insight.id} className="flex items-start gap-3">
@@ -40,6 +43,8 @@ const AIInsights: React.FC = () => {
                         </li>
                     ))}
                 </ul>
+            ) : (
+                <div className="text-center text-gray-400">No insights available at this time.</div>
             )}
         </Card>
     );
