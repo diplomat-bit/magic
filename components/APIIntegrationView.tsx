@@ -108,26 +108,39 @@ const useIntegrationConfig = () => {
         setLocalMtOrgId(modernTreasuryOrganizationId || '');
     }, [geminiApiKey, modernTreasuryApiKey, modernTreasuryOrganizationId]);
 
-    const syncToBackend = useCallback(async (callback: () => void) => {
-        return new Promise<void>((resolve, reject) => {
-            setTimeout(() => {
-                try {
-                    callback();
-                    resolve();
-                } catch (err) {
-                    reject(new Error('Failed to synchronize with backend.'));
-                }
-            }, 800);
-        });
+    const syncToBackend = useCallback(async (callback: () => Promise<void> | void) => {
+        try {
+            // Simulate network delay for synchronization
+            await new Promise<void>((resolve) => setTimeout(resolve, 800));
+            await callback();
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to synchronize with backend.';
+            throw new Error(errorMessage);
+        }
     }, []);
 
-    const saveGeminiConfig = useCallback(() => syncToBackend(() => setGeminiApiKey(localGeminiKey)), [syncToBackend, setGeminiApiKey, localGeminiKey]);
-    const saveMtConfig = useCallback(() => syncToBackend(() => {
-        setModernTreasuryApiKey(localMtKey);
-        setModernTreasuryOrganizationId(localMtOrgId);
+    const saveGeminiConfig = useCallback(() => syncToBackend(async () => {
+        if (!localGeminiKey.trim()) throw new Error('Gemini API Key cannot be empty.');
+        await Promise.resolve(setGeminiApiKey(localGeminiKey));
+    }), [syncToBackend, setGeminiApiKey, localGeminiKey]);
+
+    const saveMtConfig = useCallback(() => syncToBackend(async () => {
+        if (!localMtKey.trim()) throw new Error('Modern Treasury API Key cannot be empty.');
+        if (!localMtOrgId.trim()) throw new Error('Modern Treasury Organization ID cannot be empty.');
+        await Promise.resolve(setModernTreasuryApiKey(localMtKey));
+        await Promise.resolve(setModernTreasuryOrganizationId(localMtOrgId));
     }), [syncToBackend, setModernTreasuryApiKey, setModernTreasuryOrganizationId, localMtKey, localMtOrgId]);
-    const savePlaidConfig = useCallback(() => syncToBackend(() => { /* Securely store Plaid keys */ }), [syncToBackend]);
-    const saveStripeConfig = useCallback(() => syncToBackend(() => { /* Securely store Stripe keys */ }), [syncToBackend]);
+
+    const savePlaidConfig = useCallback(() => syncToBackend(async () => {
+        if (!localPlaidId.trim()) throw new Error('Plaid Client ID cannot be empty.');
+        if (!localPlaidSecret.trim()) throw new Error('Plaid Secret cannot be empty.');
+        /* Securely store Plaid keys */
+    }), [syncToBackend, localPlaidId, localPlaidSecret]);
+
+    const saveStripeConfig = useCallback(() => syncToBackend(async () => {
+        if (!localStripeKey.trim()) throw new Error('Stripe Secret Key cannot be empty.');
+        /* Securely store Stripe keys */
+    }), [syncToBackend, localStripeKey]);
 
     return {
         apiStatus,
@@ -291,23 +304,43 @@ const APIIntegrationView: React.FC = () => {
     }, []);
 
     const handleSaveGemini = useCallback(async () => {
-        await saveGeminiConfig();
-        showFeedback('Secure synchronization with backend complete.', 'success');
+        try {
+            await saveGeminiConfig();
+            showFeedback('Secure synchronization with backend complete.', 'success');
+        } catch (error) {
+            showFeedback(error instanceof Error ? error.message : 'Failed to synchronize.', 'error');
+            throw error;
+        }
     }, [saveGeminiConfig, showFeedback]);
 
     const handleSaveMt = useCallback(async () => {
-        await saveMtConfig();
-        showFeedback('Secure synchronization with backend complete.', 'success');
+        try {
+            await saveMtConfig();
+            showFeedback('Secure synchronization with backend complete.', 'success');
+        } catch (error) {
+            showFeedback(error instanceof Error ? error.message : 'Failed to synchronize.', 'error');
+            throw error;
+        }
     }, [saveMtConfig, showFeedback]);
 
     const handleSavePlaid = useCallback(async () => {
-        await savePlaidConfig();
-        showFeedback('Secure synchronization with backend complete.', 'success');
+        try {
+            await savePlaidConfig();
+            showFeedback('Secure synchronization with backend complete.', 'success');
+        } catch (error) {
+            showFeedback(error instanceof Error ? error.message : 'Failed to synchronize.', 'error');
+            throw error;
+        }
     }, [savePlaidConfig, showFeedback]);
 
     const handleSaveStripe = useCallback(async () => {
-        await saveStripeConfig();
-        showFeedback('Secure synchronization with backend complete.', 'success');
+        try {
+            await saveStripeConfig();
+            showFeedback('Secure synchronization with backend complete.', 'success');
+        } catch (error) {
+            showFeedback(error instanceof Error ? error.message : 'Failed to synchronize.', 'error');
+            throw error;
+        }
     }, [saveStripeConfig, showFeedback]);
 
     return (
