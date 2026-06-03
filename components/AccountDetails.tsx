@@ -214,7 +214,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ customerId, accountId }
     setIsAiLoading(true);
 
     try {
-        const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || 'DEMO_MODE_KEY' });
+        const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || 'DEMO_MODE_KEY' });
 
         const systemContext = `
             You are the "Quantum Financial Nexus AI Pilot". 
