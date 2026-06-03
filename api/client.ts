@@ -49,4 +49,23 @@ apiClient.interceptors.request.use(
   }
 );
 
+// Response interceptor to handle 401 Unauthorized responses gracefully
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      if (typeof window !== 'undefined') {
+        // Clear the expired or invalid token
+        localStorage.removeItem('auth_token');
+        
+        // Redirect to the login page
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default apiClient;
