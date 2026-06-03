@@ -40,10 +40,19 @@ jobs:
           fi
 
       - name: Verify Environment Variables
+        env:
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PRICE_ID: ${{ secrets.STRIPE_PRICE_ID }}
         run: |
           echo "==== VERIFYING REQUIRED ENVIRONMENT VARIABLES ===="
-          # Add required environment variables here, e.g., if [ -z "$REQUIRED_VAR" ]; then exit 1; fi
-          # This ensures the build process does not fail silently due to missing configuration.
+          if [ -z "$STRIPE_SECRET_KEY" ]; then
+            echo "Error: STRIPE_SECRET_KEY is missing."
+            exit 1
+          fi
+          if [ -z "$STRIPE_PRICE_ID" ]; then
+            echo "Error: STRIPE_PRICE_ID is missing."
+            exit 1
+          fi
           echo "Environment verification complete."
 
       - name: Type Compliance Checks
