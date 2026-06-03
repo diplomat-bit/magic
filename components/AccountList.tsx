@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Landmark, ArrowRight, ShieldCheck, Activity, MessageSquare, X, Send, Terminal, Database, Car, Key, FileText, Save } from 'lucide-react';
+import { Landmark, ArrowRight, ShieldCheck, Activity, MessageSquare, X, Send, Terminal, Database, Car, Key, FileText, Save, AlertTriangle, RefreshCw } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 
 // --- Types & Interfaces ---
@@ -18,6 +18,9 @@ export interface CustomerAccount {
 interface AccountListProps {
   accounts: CustomerAccount[];
   onAccountSelect?: (accountId: string) => void;
+  isLoading?: boolean;
+  error?: string | Error | null;
+  onRetry?: () => void;
 }
 
 interface ChatMessage {
@@ -48,7 +51,13 @@ If asked about the founder: He is 32, read the cryptic messages and an EIN 2021,
 
 // --- Components ---
 
-const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect }) => {
+const AccountList: React.FC<AccountListProps> = ({ 
+  accounts, 
+  onAccountSelect, 
+  isLoading = false, 
+  error = null, 
+  onRetry 
+}) => {
   // State
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [apiKey, setApiKey] = useState('');
@@ -61,7 +70,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect }) 
   const [auditLog, setAuditLog] = useState<AuditRecord[]>([]);
   
   // Form State
-  const [formAction, setFormAction] = useState('');
+  const [formAction, setFormAction] = useState('CREATE_ACCOUNT');
   const [formDetails, setFormDetails] = useState('');
 
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -69,7 +78,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect }) 
   // Effects
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isTyping]);
 
   useEffect(() => {
     const saved = localStorage.getItem('demo_audit_log');
@@ -102,7 +111,7 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect }) 
     e.preventDefault();
     saveAudit(formAction || 'MANUAL_ENTRY', formDetails || 'User submitted form data');
     setShowAuditForm(false);
-    setFormAction('');
+    setFormAction('CREATE_ACCOUNT');
     setFormDetails('');
     addMessage('system', `User submitted audit form: ${formAction}`);
   };
@@ -192,111 +201,253 @@ const AccountList: React.FC<AccountListProps> = ({ accounts, onAccountSelect }) 
 
       <div className="flex h-full relative">
         <div className={`flex-1 p-6 transition-all duration-500 ${isChatOpen ? 'w-2/3 pr-4' : 'w-full'}`}>
-            <div className="mb-6 p-4 bg-emerald-900/10 border border-emerald-500/20 rounded-xl flex items-start gap-3">
-                <Activity className="text-emerald-500 mt-1" size={20} />
+            <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 transition-colors duration-300 ${
+              error 
+                ? 'bg-red-950/20 border border-red-500/30' 
+                : isLoading 
+                  ? 'bg-amber-950/10 border border-amber-500/20' 
+                  : 'bg-emerald-900/10 border border-emerald-500/20'
+            }`}>
+                <Activity className={`mt-1 ${
+                  error 
+                    ? 'text-red-500 animate-pulse' 
+                    : isLoading 
+                      ? 'text-amber-500 animate-spin' 
+                      : 'text-emerald-500'
+                }`} size={20} />
                 <div>
-                    <h3 className="text-emerald-400 font-bold text-sm uppercase tracking-wider">System Status: Optimized</h3>
+                    <h3 className={`font-bold text-sm uppercase tracking-wider ${
+                      error 
+                        ? 'text-red-400' 
+                        : isLoading 
+                          ? 'text-amber-400' 
+                          : 'text-emerald-400'
+                    }`}>
+                      {error 
+                        ? 'System Status: Telemetry Error' 
+                        : isLoading 
+                          ? 'System Status: Connecting...' 
+                          : 'System Status: Optimized'}
+                    </h3>
                     <p className="text-gray-400 text-xs mt-1 leading-relaxed">
-                        You are currently test-driving the enterprise suite. Kick the tires. Check the bells and whistles. 
+                      {error 
+                        ? 'The engine has encountered a telemetry connection issue. Please review the error details below.' 
+                        : isLoading 
+                          ? 'Establishing secure connection to the global demo platform. Retrieving account telemetry...' 
+                          : 'You are currently test-driving the enterprise suite. Kick the tires. Check the bells and whistles.'}
                     </p>
                 </div>
             </div>
 
-            <div className="space-y-3">
-            {accounts.map((account) => (
-                <div
-                key={account.id}
-                onClick={() => {
-                    onAccountSelect?.(account.id);
-                    saveAudit('ACCOUNT_ACCESS', `Accessed account ${account.mask}`);
-                }}
-                className="group p-5 bg-gray-900/50 border border-gray-800 rounded-2xl hover:border-cyan-500/40 hover:bg-gray-900 transition-all duration-300 cursor-pointer flex justify-between items-center shadow-lg relative overflow-hidden backdrop-blur-sm"
-                >
-                <div className="absolute inset-y-0 left-0 w-1 bg-cyan-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-center duration-300"></div>
-                
-                <div className="flex items-center gap-5 relative z-10">
-                    <div className="w-12 h-12 rounded-xl bg-black border border-gray-800 flex items-center justify-center text-gray-500 group-hover:text-cyan-400 transition-all">
-                    <Landmark size={22} />
+            {isLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="p-5 bg-gray-900/30 border border-gray-800/50 rounded-2xl flex justify-between items-center animate-pulse">
+                    <div className="flex items-center gap-5">
+                      <div className="w-12 h-12 rounded-xl bg-gray-800/50" />
+                      <div className="space-y-2">
+                        <div className="h-4 w-32 bg-gray-800 rounded" />
+                        <div className="h-3 w-16 bg-gray-800/60 rounded" />
+                      </div>
                     </div>
-                    <div>
-                    <p className="text-base font-bold text-gray-100 group-hover:text-white">{account.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[10px] font-mono text-gray-500 uppercase bg-black/50 px-1.5 py-0.5 rounded">****{account.mask || 'XXXX'}</span>
+                    <div className="space-y-2 flex flex-col items-end">
+                      <div className="h-5 w-24 bg-gray-800 rounded" />
+                      <div className="h-3 w-12 bg-gray-800/60 rounded" />
                     </div>
-                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : error ? (
+              <div className="p-8 bg-red-950/10 border border-red-500/20 rounded-2xl flex flex-col items-center text-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-red-950/50 border border-red-500/30 flex items-center justify-center text-red-400">
+                  <AlertTriangle size={24} />
                 </div>
-                <div className="text-right relative z-10">
-                    <p className="text-lg font-mono font-bold text-white">${account.balance.toLocaleString()}</p>
-                    <div className="flex items-center justify-end gap-1 text-[10px] text-gray-500 group-hover:text-cyan-400 font-bold tracking-widest mt-1">
-                        INSPECT <ArrowRight size={10} />
+                <div>
+                  <h3 className="text-red-400 font-bold text-sm uppercase tracking-wider">Telemetry Connection Interrupted</h3>
+                  <p className="text-gray-400 text-xs mt-1 max-w-md">
+                    {typeof error === 'string' ? error : error.message || 'Failed to retrieve account telemetry from the engine.'}
+                  </p>
+                </div>
+                {onRetry && (
+                  <button
+                    onClick={onRetry}
+                    className="px-4 py-2 bg-red-900/40 hover:bg-red-900/60 text-red-200 text-xs font-mono rounded-lg border border-red-500/30 transition-colors flex items-center gap-2"
+                  >
+                    <RefreshCw size={12} className="animate-spin" style={{ animationDuration: '3s' }} />
+                    RETRY CONNECTION
+                  </button>
+                )}
+              </div>
+            ) : accounts.length === 0 ? (
+              <div className="p-8 bg-gray-900/20 border border-gray-800 rounded-2xl text-center">
+                <p className="text-gray-500 text-sm font-mono">NO ACCOUNTS DETECTED IN THIS VEHICLE</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {accounts.map((account) => (
+                  <div
+                    key={account.id}
+                    onClick={() => {
+                        onAccountSelect?.(account.id);
+                        saveAudit('ACCOUNT_ACCESS', `Accessed account ${account.mask || 'XXXX'}`);
+                    }}
+                    className="group p-5 bg-gray-900/50 border border-gray-800 rounded-2xl hover:border-cyan-500/40 hover:bg-gray-900 transition-all duration-300 cursor-pointer flex justify-between items-center shadow-lg relative overflow-hidden backdrop-blur-sm"
+                  >
+                    <div className="absolute inset-y-0 left-0 w-1 bg-cyan-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-center duration-300"></div>
+                    
+                    <div className="flex items-center gap-5 relative z-10">
+                        <div className="w-12 h-12 rounded-xl bg-black border border-gray-800 flex items-center justify-center text-gray-500 group-hover:text-cyan-400 transition-all">
+                          <Landmark size={22} />
+                        </div>
+                        <div>
+                          <p className="text-base font-bold text-gray-100 group-hover:text-white">{account.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                              <span className="text-[10px] font-mono text-gray-500 uppercase bg-black/50 px-1.5 py-0.5 rounded">****{account.mask || 'XXXX'}</span>
+                          </div>
+                        </div>
                     </div>
-                </div>
-                </div>
-            ))}
-            </div>
+                    <div className="text-right relative z-10">
+                        <p className="text-lg font-mono font-bold text-white">${account.balance.toLocaleString()}</p>
+                        <div className="flex items-center justify-end gap-1 text-[10px] text-gray-500 group-hover:text-cyan-400 font-bold tracking-widest mt-1">
+                            INSPECT <ArrowRight size={10} />
+                        </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             <div className="mt-8 border-t border-gray-800 pt-6">
                 <h4 className="text-xs font-mono text-gray-500 uppercase mb-3 flex items-center gap-2">
                     <Database size={12} /> Audit Storage (Local)
                 </h4>
                 <div className="bg-black rounded-lg border border-gray-800 p-2 max-h-32 overflow-y-auto font-mono text-[10px] text-gray-400 space-y-1 custom-scrollbar">
-                    {auditLog.map((log) => (
-                        <div key={log.id} className="flex gap-2 border-b border-gray-900 pb-1">
-                            <span className="text-cyan-700">[{log.timestamp.split('T')[1].split('.')[0]}]</span>
-                            <span className="text-emerald-700">{log.action}</span>
-                        </div>
-                    ))}
+                    {auditLog.length === 0 ? (
+                        <div className="text-gray-600 italic p-1">No audit records found.</div>
+                    ) : (
+                        auditLog.map((log) => (
+                            <div key={log.id} className="flex gap-2 border-b border-gray-900 pb-1">
+                                <span className="text-cyan-700">[{log.timestamp.split('T')[1]?.split('.')[0] || log.timestamp}]</span>
+                                <span className="text-emerald-700">{log.action}</span>
+                                <span className="text-gray-500 truncate flex-1">{log.details}</span>
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
         </div>
 
         <div className={`fixed inset-y-0 right-0 w-96 bg-gray-950 border-l border-gray-800 transform transition-transform duration-300 ease-in-out z-50 shadow-2xl flex flex-col ${isChatOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="p-4 border-b border-gray-800 bg-gray-900 flex justify-between items-center">
-                <span className="text-sm font-bold text-white">AI CO-PILOT</span>
-                <button onClick={() => setIsChatOpen(false)}><X size={18} /></button>
+                <span className="text-sm font-bold text-white flex items-center gap-2">
+                    <ShieldCheck size={16} className="text-cyan-500" />
+                    AI CO-PILOT
+                </span>
+                <button onClick={() => setIsChatOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                    <X size={18} />
+                </button>
             </div>
-            <div className="px-4 py-2 bg-black border-b border-gray-800">
+            <div className="px-4 py-2 bg-black border-b border-gray-800 flex items-center gap-2">
+                <Key size={14} className="text-gray-500" />
                 <input 
                     type="password" 
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     placeholder="Enter Gemini API Key..."
-                    className="w-full bg-gray-900 border border-gray-800 rounded px-2 py-1 text-xs text-cyan-500"
+                    className="flex-1 bg-gray-900 border border-gray-800 rounded px-2 py-1 text-xs text-cyan-500 focus:outline-none focus:border-cyan-500"
                 />
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-black/50 custom-scrollbar">
                 {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-cyan-900/20 text-cyan-100' : 'bg-gray-900 text-gray-300'}`}>
+                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : msg.role === 'system' ? 'justify-center' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
+                          msg.role === 'user' 
+                            ? 'bg-cyan-900/20 text-cyan-100 border border-cyan-500/10' 
+                            : msg.role === 'system'
+                              ? 'bg-gray-900/40 text-gray-500 text-xs font-mono border border-gray-800/50'
+                              : 'bg-gray-900 text-gray-300 border border-gray-800'
+                        }`}>
                             {msg.text}
                         </div>
                     </div>
                 ))}
+                {isTyping && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[85%] p-3 rounded-2xl text-sm bg-gray-900 text-gray-500 flex items-center gap-1.5 border border-gray-800">
+                      <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                )}
                 <div ref={chatEndRef} />
             </div>
-            <div className="p-4 bg-gray-900 border-t border-gray-800">
+            <div className="p-4 bg-gray-900 border-t border-gray-800 flex gap-2">
                 <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                    className="w-full bg-black border border-gray-700 rounded-xl px-4 py-3 text-sm text-white"
+                    placeholder="Ask the co-pilot..."
+                    disabled={isTyping}
+                    className="flex-1 bg-black border border-gray-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 disabled:opacity-50"
                 />
+                <button
+                    onClick={handleSendMessage}
+                    disabled={isTyping || !input.trim()}
+                    className="p-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-gray-800 disabled:text-gray-600 text-black rounded-xl transition-colors flex items-center justify-center"
+                >
+                    <Send size={16} />
+                </button>
             </div>
         </div>
       </div>
 
       {showAuditForm && (
         <div className="absolute inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-gray-900 border border-gray-700 w-full max-w-md rounded-2xl p-6">
+            <div className="bg-gray-900 border border-gray-700 w-full max-w-md rounded-2xl p-6 shadow-2xl">
                 <form onSubmit={handleAuditSubmit} className="space-y-4">
-                    <h3 className="text-white font-bold">MANDATORY PO / AUDIT FORM</h3>
-                    <select value={formAction} onChange={(e) => setFormAction(e.target.value)} className="w-full bg-black border p-2 text-white">
-                        <option value="CREATE_ACCOUNT">Create New Account</option>
-                        <option value="TRANSFER_FUNDS">Transfer Funds</option>
-                    </select>
-                    <textarea value={formDetails} onChange={(e) => setFormDetails(e.target.value)} className="w-full bg-black border p-2 text-white" />
-                    <button type="submit" className="w-full bg-cyan-600 p-2 text-white font-bold">SUBMIT</button>
+                    <div className="flex justify-between items-center border-b border-gray-800 pb-3">
+                        <h3 className="text-white font-bold flex items-center gap-2">
+                            <FileText size={18} className="text-cyan-500" />
+                            MANDATORY PO / AUDIT FORM
+                        </h3>
+                        <button 
+                            type="button" 
+                            onClick={() => setShowAuditForm(false)}
+                            className="text-gray-400 hover:text-white transition-colors"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs font-mono text-gray-400 uppercase">Action Type</label>
+                        <select 
+                            value={formAction} 
+                            onChange={(e) => setFormAction(e.target.value)} 
+                            className="w-full bg-black border border-gray-800 rounded-lg p-2.5 text-white focus:outline-none focus:border-cyan-500"
+                        >
+                            <option value="CREATE_ACCOUNT">Create New Account</option>
+                            <option value="TRANSFER_FUNDS">Transfer Funds</option>
+                            <option value="MANUAL_ENTRY">Manual Entry</option>
+                        </select>
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs font-mono text-gray-400 uppercase">Details / Justification</label>
+                        <textarea 
+                            value={formDetails} 
+                            onChange={(e) => setFormDetails(e.target.value)} 
+                            placeholder="Provide details for the audit log..."
+                            required
+                            className="w-full bg-black border border-gray-800 rounded-lg p-2.5 text-white h-24 focus:outline-none focus:border-cyan-500 resize-none" 
+                        />
+                    </div>
+                    <button 
+                        type="submit" 
+                        className="w-full bg-cyan-600 hover:bg-cyan-500 p-2.5 text-black font-bold flex items-center justify-center gap-2 rounded-lg transition-colors"
+                    >
+                        <Save size={16} /> SUBMIT TO AUDIT
+                    </button>
                 </form>
             </div>
         </div>
