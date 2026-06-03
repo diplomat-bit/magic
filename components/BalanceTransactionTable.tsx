@@ -1,4 +1,3 @@
-
 import React from 'react';
 import type { Stripe } from 'stripe';
 
@@ -96,7 +95,7 @@ const BalanceTransactionTable: React.FC<BalanceTransactionTableProps> = ({ balan
                   {formatDate(txn.created)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 capitalize">
-                  {txn.reporting_category.replace(/_/g, ' ')}
+                  {((txn as any).reporting_category || txn.type || '').replace(/_/g, ' ')}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600 max-w-sm truncate" title={txn.description ?? ''}>
                   {txn.description || <span className="text-gray-400">N/A</span>}
@@ -121,7 +120,7 @@ const BalanceTransactionTable: React.FC<BalanceTransactionTableProps> = ({ balan
                     {txn.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono" title={txn.source ?? ''}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono" title={typeof txn.source === 'string' ? txn.source : (txn.source as any)?.id || ''}>
                   {typeof txn.source === 'string' ? txn.source : (txn.source as any)?.id || 'N/A'}
                 </td>
               </tr>
