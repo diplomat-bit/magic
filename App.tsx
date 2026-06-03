@@ -163,7 +163,7 @@ import WebhookSimulator from './components/WebhookSimulator';
 
 // --- FIXED Wrapper Components ---
 type WrapperProps = {
-  Component: React.FC<any>;
+  Component: React.ComponentType<any>;
   props?: any;
 };
 
@@ -182,7 +182,7 @@ const ModalWrapper: React.FC<WrapperProps> = ({ Component, props = {} }) => {
   );
 };
 
-const DataContextWrapper: React.FC<{ Component: React.FC<any>; extraProps?: any }> = ({ Component, extraProps = {} }) => {
+const DataContextWrapper: React.FC<{ Component: React.ComponentType<any>; extraProps?: any }> = ({ Component, extraProps = {} }) => {
   const dataContext = useContext(DataContext);
   const mockContext = {
     setActiveView: () => {},
@@ -258,10 +258,10 @@ const SAppLayout = () => {
         <div className="w-80 h-1 bg-gray-900 rounded-full overflow-hidden">
           <div className="h-full bg-cyan-500 animate-progress-flow"></div>
         </div>
-        <style>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
           .animate-progress-flow { animation: flow 2s linear infinite; width: 50%; }
-        `}</style>
+        ` }} />
       </div>
     );
   }
