@@ -1,4 +1,3 @@
-
 import React, { useContext, useState } from 'react';
 import Card from './Card';
 import { DataContext } from '../context/DataContext';
@@ -54,7 +53,7 @@ const BudgetsView: React.FC = () => {
   const context = useContext(DataContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  if (!context) return <div>Loading...</div>;
+  if (!context || !context.addBudget) return <div>Loading...</div>;
   
   const { budgets, transactions, addBudget } = context;
   
