@@ -18,6 +18,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import SApp from './components/SApp';
 import { View } from './types';
+import Paywall from './components/Paywall';
 
 // Views & Components
 import Dashboard from './components/Dashboard';
@@ -245,7 +246,7 @@ const SAppLayout = () => {
 
   if (!dataContext || !authContext) return null;
   const { isAuthenticated, isLoading: authLoading } = authContext;
-  const { isLoading: dataLoading, activeView, setActiveView } = dataContext;
+  const { isLoading: dataLoading, activeView, setActiveView, isSubscribed } = dataContext;
 
   if (authLoading || (isAuthenticated && dataLoading)) {
     return (
@@ -481,7 +482,7 @@ const SAppLayout = () => {
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 custom-scrollbar bg-[radial-gradient(circle_at_50%_0%,#111,transparent)]">
           <div className="max-w-[1600px] mx-auto h-full min-h-0">
-            {renderView()}
+            {!isSubscribed ? <Paywall /> : renderView()}
           </div>
         </main>
         <MonetizationOverlay />
