@@ -4,6 +4,9 @@ import { fileURLToPath } from 'url';
 import { auth } from 'express-oauth2-jwt-bearer';
 import dotenv from 'dotenv'; // Import dotenv to load environment variables
 
+// ==========================================
+// 1. Environment Setup & Configuration
+// ==========================================
 // Load environment variables from .env file
 dotenv.config();
 
@@ -13,27 +16,35 @@ const PORT = process.env.PORT || 7860;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 1. Add express.json() middleware to parse JSON request bodies
+// ==========================================
+// 2. Middleware Configuration
+// ==========================================
+// Parse JSON request bodies
 app.use(express.json());
 
-// Authorization middleware.
+// Authorization middleware (Auth0 JWT Check)
 const jwtCheck = auth({
   audience: 'https://aibankinguniversity.us.auth0.com/api/v2/', // Updated to standard Auth0 audience or your specific API identifier
   issuerBaseURL: 'https://aibankinguniversity.us.auth0.com/',
   tokenSigningAlg: 'RS256'
 });
 
-// Enforce on API routes (example pattern)
+// Enforce JWT check on all /api routes
 app.use('/api', jwtCheck);
 
-// Protected endpoint
+// ==========================================
+// 3. API Routes
+// ==========================================
+
+// Route: GET /api/authorized
+// Description: A simple protected endpoint to verify authentication.
 app.get('/api/authorized', (req, res) => {
     res.json({ message: 'Secured Resource Accessed Successfully' });
 });
 
-// 3. Create a new POST API endpoint, /api/gemini-chat
-// 4. Implement placeholder logic for Gemini API interaction
-// 5. Add error handling for the API endpoint.
+// Route: POST /api/gemini-chat
+// Description: Endpoint to handle chat messages and interact with the Gemini API.
+// Note: Currently uses placeholder logic for Gemini API interaction.
 app.post('/api/gemini-chat', jwtCheck, async (req, res) => {
   try {
     const { message } = req.body;
@@ -78,15 +89,21 @@ app.post('/api/gemini-chat', jwtCheck, async (req, res) => {
   }
 });
 
+// ==========================================
+// 4. Static File Serving & SPA Routing
+// ==========================================
 
-// Serve static files from the 'dist' directory
+// Serve static files from the 'dist' directory (frontend build)
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle all other routes by serving the index.html for SPA routing
+// Handle all other routes by serving the index.html for Single Page Application (SPA) routing
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
+// ==========================================
+// 5. Server Startup
+// ==========================================
 app.listen(PORT, () => {
   console.log(`Server is running on https://0.0.0.0:${PORT}`);
 });
