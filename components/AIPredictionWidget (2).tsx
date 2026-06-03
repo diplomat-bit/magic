@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 import Card from './Card';
 import { Brain } from 'lucide-react';
@@ -475,4 +475,3 @@ const JBOCCode_AIPredictionWidget: React.FC = () => {
 };
 
 export default JBOCCode_AIPredictionWidget;
-```
