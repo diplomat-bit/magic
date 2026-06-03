@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { 
     BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, 
     LineChart, Line, CartesianGrid, AreaChart, Area, PieChart, Pie 
@@ -53,7 +53,35 @@ export interface EnhancedAIInsight {
 
 // --- AUDIT LOGGING SYSTEM ---
 const useAuditLogger = () => {
-    const [logs, setLogs] = useState<AuditEntry[]>([]);
+    const [logs, setLogs] = useState<AuditEntry[]>(() => [
+        {
+            id: 'LOG-INIT001',
+            timestamp: new Date(Date.now() - 60000 * 5).toISOString(),
+            action: 'SYSTEM_BOOT',
+            actor: 'SYSTEM_KERNEL',
+            severity: 'INFO',
+            details: 'Quantum Financial Engine v4.0.0 initialized successfully.',
+            checksum: 'a1b2c3d4'
+        },
+        {
+            id: 'LOG-INIT002',
+            timestamp: new Date(Date.now() - 60000 * 4).toISOString(),
+            action: 'SECURE_NODE_CONNECT',
+            actor: 'SYSTEM_AUTH_USER_01',
+            severity: 'INFO',
+            details: 'Connected to secure node 0x4F2 (Frankfurt).',
+            checksum: 'e5f6g7h8'
+        },
+        {
+            id: 'LOG-INIT003',
+            timestamp: new Date(Date.now() - 60000 * 3).toISOString(),
+            action: 'MFA_VERIFICATION',
+            actor: 'SYSTEM_AUTH_USER_01',
+            severity: 'INFO',
+            details: 'Multi-factor authentication verified successfully.',
+            checksum: 'i9j0k1l2'
+        }
+    ]);
     
     const logAction = useCallback((action: string, details: string, severity: AuditEntry['severity'] = 'INFO') => {
         const newEntry: AuditEntry = {
@@ -150,7 +178,7 @@ const QuantumChat: React.FC<{ onAction: (action: string, data: any) => void }> =
             if (!response.ok) throw new Error('API Error');
 
             const data = await response.json();
-            const text = data.response || data.text || data.reply || '';
+            const text = data.response || data.text || data.reply || data.message || (typeof data === 'string' ? data : '');
 
             // Parse Action
             const actionMatch = text.match(/ACTION:\s*({.*})/);
@@ -195,6 +223,26 @@ const QuantumChat: React.FC<{ onAction: (action: string, data: any) => void }> =
                         ))}
                         {isTyping && <div className="text-xs text-cyan-500 animate-pulse">AI is calculating market vectors...</div>}
                     </div>
+                    
+                    {/* Quick Prompts */}
+                    <div className="px-4 py-2 bg-gray-950 border-t border-gray-900 flex gap-2 overflow-x-auto shrink-0 custom-scrollbar">
+                        {[
+                            { label: 'Analyze Risk', text: 'Analyze current portfolio risk exposure.' },
+                            { label: 'Trigger Wire', text: 'Initiate a wire transfer of $50,000 to SG-Global-Trade.' },
+                            { label: 'Optimize Yield', text: 'What is the best yield optimization strategy right now?' }
+                        ].map((p, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => {
+                                    setInput(p.text);
+                                }}
+                                className="shrink-0 px-2 py-1 bg-gray-900 hover:bg-gray-800 border border-gray-800 rounded text-[10px] text-cyan-400 font-medium transition-colors"
+                            >
+                                {p.label}
+                            </button>
+                        ))}
+                    </div>
+
                     <div className="p-4 border-t border-gray-800 bg-gray-950 shrink-0">
                         <div className="flex gap-2">
                             <input 
@@ -266,7 +314,7 @@ const StripeCheckoutModal: React.FC<{ amount: number; recipient: string; onClose
                                 <div className="w-12 h-8 bg-gray-900 rounded flex items-center justify-center font-bold text-[10px] text-white">VISA</div>
                                 <div className="flex-1">
                                     <div className="text-sm font-medium text-white">•••• 4242</div>
-                                    <div className="text-xs text-gray-400">Expires 12/26</div>
+                                    <div className="text-xs text-gray-400">Expires 12/28</div>
                                 </div>
                             </div>
                             <button 
@@ -305,6 +353,8 @@ export const AIInsights: React.FC = () => {
     const [selectedInsight, setSelectedInsight] = useState<EnhancedAIInsight | null>(null);
     const [showStripe, setShowStripe] = useState(false);
     const [stripeData, setStripeData] = useState({ amount: 0, recipient: '' });
+    const [filter, setFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
+    const [centerView, setCenterView] = useState<'performance' | 'allocation'>('performance');
 
     // Mock Data Generation
     const insights: EnhancedAIInsight[] = useMemo(() => [
@@ -360,18 +410,41 @@ export const AIInsights: React.FC = () => {
         }
     ], []);
 
+    const filteredInsights = useMemo(() => {
+        if (filter === 'all') return insights;
+        return insights.filter(i => i.urgency === filter);
+    }, [insights, filter]);
+
+    const allocationData = [
+        { name: 'USD Liquidity', value: 45, color: '#06b6d4' },
+        { name: 'EUR Hedged', value: 25, color: '#3b82f6' },
+        { name: 'SGD Yield Pools', value: 20, color: '#8b5cf6' },
+        { name: 'Alpha Vaults', value: 10, color: '#ec4899' }
+    ];
+
     const handleAIAction = (type: string, data: any) => {
-        logAction(`AI_TRIGGERED_${type}`, JSON.stringify(data), 'INFO');
-        if (type === 'WIRE_TRANSFER') {
+        const normalizedType = type.toUpperCase();
+        logAction(`AI_TRIGGERED_${normalizedType}`, JSON.stringify(data), 'INFO');
+        if (normalizedType === 'WIRE_TRANSFER') {
             setStripeData({ amount: data.amount || 1000, recipient: data.recipient || 'Unknown Entity' });
             setShowStripe(true);
+        } else {
+            alert(`AI Action Triggered: ${normalizedType}\nDetails: ${JSON.stringify(data)}`);
         }
     };
 
     const executeStrategy = (insight: EnhancedAIInsight) => {
-        logAction(`STRATEGY_EXECUTION_${insight.actionType}`, `Executing strategy for ${insight.id}`, 'CRITICAL');
+        const actionName = `STRATEGY_EXECUTION_${insight.actionType.toUpperCase()}`;
+        logAction(actionName, `Executing strategy for ${insight.id}: ${insight.title}`, 'CRITICAL');
         setSelectedInsight(null);
-        alert(`Strategy ${insight.actionType} initiated. Check Audit Logs for progress.`);
+        
+        // Simulate multi-step execution in the audit log
+        setTimeout(() => {
+            logAction(`${actionName}_PENDING`, `Securing liquidity channels for ${insight.id}...`, 'INFO');
+        }, 1500);
+        setTimeout(() => {
+            logAction(`${actionName}_SUCCESS`, `Strategy ${insight.id} successfully executed. Position established.`, 'INFO');
+        }, 3500);
     };
 
     return (
@@ -404,9 +477,26 @@ export const AIInsights: React.FC = () => {
                 
                 {/* Left Column: Insights */}
                 <div className="lg:col-span-4 space-y-8">
-                    <Card title="Strategic Intelligence" icon={<BoltIcon />} className="border-l-4 border-l-cyan-500">
+                    <Card 
+                        title="Strategic Intelligence" 
+                        icon={<BoltIcon />} 
+                        className="border-l-4 border-l-cyan-500"
+                        action={
+                            <div className="flex gap-1 bg-gray-950 p-1 rounded-lg border border-gray-800">
+                                {(['all', 'high', 'medium', 'low'] as const).map(f => (
+                                    <button
+                                        key={f}
+                                        onClick={() => setFilter(f)}
+                                        className={`px-2 py-1 text-[10px] font-bold uppercase rounded transition-colors ${filter === f ? 'bg-cyan-600 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                                    >
+                                        {f}
+                                    </button>
+                                ))}
+                            </div>
+                        }
+                    >
                         <div className="space-y-4">
-                            {insights.map(insight => (
+                            {filteredInsights.map(insight => (
                                 <div 
                                     key={insight.id}
                                     onClick={() => setSelectedInsight(insight)}
@@ -415,7 +505,10 @@ export const AIInsights: React.FC = () => {
                                     <div className={`absolute top-0 right-0 w-1 h-full ${insight.urgency === 'high' ? 'bg-red-500' : insight.urgency === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'}`}></div>
                                     <div className="flex justify-between items-start mb-2">
                                         <h4 className="font-bold text-white group-hover:text-cyan-400 transition-colors">{insight.title}</h4>
-                                        <span className="text-[10px] font-mono text-gray-500">{insight.confidenceScore}% CONF</span>
+                                        <div className="text-right">
+                                            <span className="text-[10px] font-mono text-gray-500 block">{insight.confidenceScore}% CONF</span>
+                                            <span className="text-[9px] font-mono text-cyan-500 block">GEIN: {insight.geinFactor}</span>
+                                        </div>
                                     </div>
                                     <p className="text-xs text-gray-400 line-clamp-2 mb-3">{insight.description}</p>
                                     <div className="flex gap-2">
@@ -447,7 +540,26 @@ export const AIInsights: React.FC = () => {
 
                 {/* Center Column: Detailed Analysis */}
                 <div className="lg:col-span-5 space-y-8">
-                    <Card title="Real-Time Performance Engine" className="h-full">
+                    <Card 
+                        title="Real-Time Performance Engine" 
+                        className="h-full"
+                        action={
+                            <div className="flex gap-1 bg-gray-950 p-1 rounded-lg border border-gray-800">
+                                <button
+                                    onClick={() => setCenterView('performance')}
+                                    className={`px-2 py-1 text-[10px] font-bold uppercase rounded transition-colors ${centerView === 'performance' ? 'bg-cyan-600 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                                >
+                                    Performance
+                                </button>
+                                <button
+                                    onClick={() => setCenterView('allocation')}
+                                    className={`px-2 py-1 text-[10px] font-bold uppercase rounded transition-colors ${centerView === 'allocation' ? 'bg-cyan-600 text-white' : 'text-gray-500 hover:text-gray-300'}`}
+                                >
+                                    Allocation
+                                </button>
+                            </div>
+                        }
+                    >
                         <div className="grid grid-cols-2 gap-4 mb-8">
                             <div className="p-4 bg-gray-800/20 rounded-xl border border-gray-800">
                                 <div className="text-[10px] text-gray-500 uppercase font-bold mb-1">Alpha Generation</div>
@@ -459,23 +571,58 @@ export const AIInsights: React.FC = () => {
                             </div>
                         </div>
                         <div className="h-[400px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={Array.from({length: 8}, (_, i) => ({ name: `Node ${i}`, value: Math.random() * 100 }))}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#4b5563" fontSize={10} />
-                                    <YAxis stroke="#4b5563" fontSize={10} />
-                                    <Tooltip 
-                                        contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
-                                        itemStyle={{ color: '#06b6d4' }}
-                                    />
-                                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                                        {Array.from({length: 8}).map((_, index) => (
-                                            <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#06b6d4' : '#3b82f6'} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+                            {centerView === 'performance' ? (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={Array.from({length: 8}, (_, i) => ({ name: `Node ${i}`, value: Math.random() * 100 }))}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
+                                        <XAxis dataKey="name" stroke="#4b5563" fontSize={10} />
+                                        <YAxis stroke="#4b5563" fontSize={10} />
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                                            itemStyle={{ color: '#06b6d4' }}
+                                        />
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                            {Array.from({length: 8}).map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#06b6d4' : '#3b82f6'} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            ) : (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={allocationData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={100}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {allocationData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                                            itemStyle={{ color: '#fff' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
+                        {centerView === 'allocation' && (
+                            <div className="grid grid-cols-2 gap-2 mt-4">
+                                {allocationData.map((item, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 text-xs">
+                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                                        <span className="text-gray-400">{item.name}:</span>
+                                        <span className="font-mono font-bold text-white">{item.value}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                         <div className="mt-8 p-4 bg-cyan-900/10 border border-cyan-500/20 rounded-xl">
                             <div className="flex items-center gap-3 text-cyan-400 mb-2">
                                 <BoltIcon />
@@ -545,7 +692,12 @@ export const AIInsights: React.FC = () => {
                         <div className="mb-8">
                             <div className="text-xs font-bold text-cyan-500 uppercase tracking-widest mb-2">Insight Analysis</div>
                             <h2 className="text-2xl font-bold text-white mb-4">{selectedInsight.title}</h2>
-                            <p className="text-gray-400 leading-relaxed">{selectedInsight.description}</p>
+                            <p className="text-gray-400 leading-relaxed mb-4">{selectedInsight.description}</p>
+                            {selectedInsight.details && (
+                                <div className="p-3 bg-gray-950 border border-gray-800 rounded-lg font-mono text-xs text-gray-400">
+                                    <span className="text-gray-500">METADATA:</span> {JSON.stringify(selectedInsight.details)}
+                                </div>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-3 gap-6 mb-8">
@@ -570,6 +722,26 @@ export const AIInsights: React.FC = () => {
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
+
+                        {selectedInsight.alternativeActions && selectedInsight.alternativeActions.length > 0 && (
+                            <div className="mb-8">
+                                <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Alternative AI Recommendations</div>
+                                <div className="space-y-3">
+                                    {selectedInsight.alternativeActions.map((alt, idx) => (
+                                        <div key={idx} className="p-3 bg-gray-950 border border-gray-800 rounded-lg flex justify-between items-center">
+                                            <div>
+                                                <div className="text-xs font-bold text-white uppercase">{alt.actionType.replace('_', ' ')}</div>
+                                                <div className="text-[11px] text-gray-400">{alt.rationale}</div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-xs font-mono text-cyan-400 font-bold">{alt.confidence}%</div>
+                                                <div className="text-[9px] text-gray-500 uppercase font-bold">Confidence</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         <div className="flex gap-4">
                             <button 
@@ -603,7 +775,7 @@ export const AIInsights: React.FC = () => {
 
             {/* Footer Branding */}
             <div className="mt-12 pt-8 border-t border-gray-900 flex justify-between items-center text-[10px] text-gray-600 font-bold uppercase tracking-[0.2em]">
-                <div>© 2024 Quantum Financial Institutional Group. All Rights Reserved.</div>
+                <div>© 2026 Quantum Financial Institutional Group. All Rights Reserved.</div>
                 <div className="flex gap-6">
                     <span className="hover:text-cyan-500 cursor-pointer transition-colors">Terms of Service</span>
                     <span className="hover:text-cyan-500 cursor-pointer transition-colors">Privacy Protocol</span>
