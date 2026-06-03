@@ -1,22 +1,15 @@
-
-import React, { useState, useContext, useEffect } from 'react';
-import { HashRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import React, { useState, useContext } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Cpu, AlertTriangle } from 'lucide-react';
 
 // Contexts
-import { AuthProvider, AuthContext } from '../context/AuthContext';
-import { DataProvider, DataContext } from '../context/DataContext';
-import { StripeDataProvider } from './StripeDataProvider';
-import { MoneyMovementProvider } from './MoneyMovementContext';
+import { AuthContext } from '../context/AuthContext';
+import { DataContext } from '../context/DataContext';
 
 // Layout
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { View } from '../types';
-import { PlaidClient } from '../lib/plaidClient';
-
 
 // --- ALL VIEW COMPONENTS ---
 import AccountDetails from './AccountDetails';
@@ -99,7 +92,6 @@ import InvestmentPortfolio from './InvestmentPortfolio';
 import InvestmentsView from './InvestmentsView';
 import InvoiceFinancingRequest from './InvoiceFinancingRequest';
 import LegacyBuilder from './LegacyBuilder';
-import { LoginView } from './LoginView';
 import MarketplaceView from './MarketplaceView';
 import MarqetaDashboardView from './MarqetaDashboardView';
 import ModernTreasuryView from './ModernTreasuryView';
@@ -166,36 +158,24 @@ import VirtualAccountsTable from './VirtualAccountsTable';
 import VoiceControl from './VoiceControl';
 import WealthTimeline from './WealthTimeline';
 import WebhookSimulator from './WebhookSimulator';
-import LandingPage from './LandingPage';
 import TheBookView from './TheBookView';
 import KnowledgeBaseView from './KnowledgeBaseView';
 
-// --- Error Boundary ---
-interface ErrorBoundaryProps { children?: React.ReactNode; }
-interface ErrorBoundaryState { hasError: boolean; }
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public props: ErrorBoundaryProps;
-  state: ErrorBoundaryState = { hasError: false };
-  constructor(props: ErrorBoundaryProps) { super(props); this.props = props; }
-  static getDerivedStateFromError(error: Error) { console.error("ErrorBoundary caught:", error); return { hasError: true }; }
-  render() { return this.state.hasError ? <h1>Something went wrong.</h1> : this.props.children; }
-}
-
-// --- Layout ---
-const SAppLayout = () => {
+const SApp = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const dataContext = useContext(DataContext);
-  const { isAuthenticated } = useContext(AuthContext)!;
+  const authContext = useContext(AuthContext);
 
   if (!dataContext) {
     return <div>Error: DataContext not found.</div>;
   }
 
   const { isLoading, error, activeView, setActiveView } = dataContext;
+  const isAuthenticated = authContext?.isAuthenticated;
 
   if (isLoading) {
     return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-950 text-white gap-4">
+        <div className="h-full w-full flex flex-col items-center justify-center bg-gray-950 text-white gap-4">
             <Cpu className="w-16 h-16 text-cyan-400 animate-pulse" />
             <h1 className="text-2xl font-bold tracking-wider">INITIALIZING SOVEREIGN AI NEXUS...</h1>
             <p className="text-gray-400 font-mono">Generating financial universe from quantum foam...</p>
@@ -217,7 +197,7 @@ const SAppLayout = () => {
 
   if (error) {
       return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-950 text-red-300 gap-4 p-8">
+        <div className="h-full w-full flex flex-col items-center justify-center bg-red-950 text-red-300 gap-4 p-8">
             <AlertTriangle className="w-16 h-16 text-red-500" />
             <h1 className="text-3xl font-bold">SYSTEM INITIALIZATION FAILURE</h1>
             <p className="text-red-400 max-w-md text-center bg-red-500/10 p-4 rounded-lg border border-red-500/30">
@@ -351,7 +331,7 @@ const SAppLayout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden font-sans">
+    <div className="flex h-full bg-gray-900 text-white overflow-hidden font-sans">
       <Sidebar 
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
@@ -364,13 +344,11 @@ const SAppLayout = () => {
         </main>
       </div>
       
-      {/* FIX: Render VoiceControl correctly as a component */}
       <VoiceControl setActiveView={setActiveView} />
     </div>
   );
 };
 
-// --- Wrapper Components for Props ---
 const Wrapper = (Component: React.FC<any>, props: any = {}) => {
   const WrappedComponent = () => <Component {...props} />;
   return <WrappedComponent />;
@@ -391,53 +369,4 @@ const DataContextWrapper = (Component: React.FC<any>, extraProps: any = {}) => {
     return <WrappedComponent />;
 };
 
-const theme = createTheme({ palette: { mode: 'dark' } });
-
-// --- Protected Route Helper ---
-const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
-    const authContext = useContext(AuthContext);
-    const isAuthenticated = authContext?.isAuthenticated;
-    const isLoading = authContext?.isLoading;
-    
-    if (!isLoading && !isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
-    return <>{children}</>;
-};
-
-// --- Main App Component ---
-function sApp() {
-  return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <DataProvider>
-          <MoneyMovementProvider>
-            <StripeDataProvider>
-              <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <Router>
-                  <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<LoginView />} />
-                    <Route path="/sso" element={<SSOView />} />
-                    
-                    {/* Protected Routes Wrapper */}
-                    <Route element={
-                        <ProtectedRoute>
-                            <SAppLayout />
-                        </ProtectedRoute>
-                    }>
-                      <Route path="*" element={<Dashboard />} />
-                    </Route>
-                  </Routes>
-                </Router>
-              </ThemeProvider>
-            </StripeDataProvider>
-          </MoneyMovementProvider>
-        </DataProvider>
-      </AuthProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default sApp;
+export default SApp;
