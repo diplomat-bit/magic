@@ -154,14 +154,18 @@ const AccountList: React.FC<AccountListProps> = ({
         return;
       }
 
-      const genAI = new GoogleGenAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const fullPrompt = `${CONTEXT_STORY}\n\nUser: ${userMsg}`;
-      
-      const result = await model.generateContent(fullPrompt);
-      const responseText = result.response.text();
+      const ai = new GoogleGenAI({ apiKey });
+      const result = await ai.models.generateContent({
+        model: "gemini-1.5-flash",
+        contents: `${CONTEXT_STORY}\n\nUser: ${userMsg}`,
+      });
+      const responseText = result.text;
 
-      addMessage('model', responseText);
+      if (responseText) {
+        addMessage('model', responseText);
+      } else {
+        addMessage('model', "Received empty response from the engine.");
+      }
     } catch (error) {
       console.error("AI Error", error);
       addMessage('model', "Engine stall. Please check your API Key or connection. " + (error as Error).message);
