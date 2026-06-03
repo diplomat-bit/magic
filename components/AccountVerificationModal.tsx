@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, useRef, useMemo, useCallback } from 'react';
+import React, { useState, FC, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield,
@@ -6,8 +6,6 @@ import {
   Lock,
   Cpu,
   Activity,
-  MessageSquare,
-  Send,
   CheckCircle,
   AlertTriangle,
   ChevronRight,
@@ -35,7 +33,6 @@ import {
   TrendingUp,
   Gauge
 } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
 
 /**
  * QUANTUM FINANCIAL - THE ELITE BUSINESS DEMO ENGINE
@@ -43,7 +40,7 @@ import { GoogleGenAI } from "@google/genai";
  * PHILOSOPHY:
  * - "Golden Ticket" Experience: High polish, zero friction.
  * - "Test Drive": Interactive, visual, and responsive.
- * - "Bells and Whistles": Advanced simulations (AI, Fraud, MFA, ERP).
+ * - "Bells and Whistles": Advanced simulations (Fraud, MFA, ERP).
  * - "Cheat Sheet": Clear insights into complex banking operations.
  * - "No Pressure": Sandbox environment for exploration.
  * 
@@ -96,35 +93,6 @@ interface AccountVerificationModalProps {
 type VerificationStep = 'initiate' | 'mfa' | 'fraud_analysis' | 'erp_sync' | 'final_review' | 'success';
 
 // --- SIMULATED ENGINES ---
-
-/**
- * QuantumVault: Simulates Homomorphic Encryption Storage.
- * Allows operations on data without exposing the underlying values.
- */
-class QuantumVault {
-  private static instance: QuantumVault;
-  private storage: Map<string, { cipher: string; noise: string }> = new Map();
-
-  private constructor() {}
-
-  static getInstance() {
-    if (!QuantumVault.instance) QuantumVault.instance = new QuantumVault();
-    return QuantumVault.instance;
-  }
-
-  async secureStore(key: string, value: string): Promise<void> {
-    const cipher = btoa(`QUANTUM_ENC_${value}_${Date.now()}`);
-    const noise = Math.random().toString(36).substring(7);
-    this.storage.set(key, { cipher, noise });
-  }
-
-  async blindVerify(key: string, input: string): Promise<boolean> {
-    const stored = this.storage.get(key);
-    if (!stored) return false;
-    const decoded = atob(stored.cipher);
-    return decoded.includes(`QUANTUM_ENC_${input}_`);
-  }
-}
 
 /**
  * FraudEngine: Heuristic analysis simulation.
@@ -201,22 +169,6 @@ export const AccountVerificationModal: FC<AccountVerificationModalProps> = ({
   const [showAudit, setShowAudit] = useState(false);
   const [fraudSignals, setFraudSignals] = useState<FraudSignal[]>([]);
   const [erpStatus, setErpStatus] = useState<'idle' | 'syncing' | 'complete'>('idle');
-  
-  // AI State
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<{role: 'user' | 'ai', content: string}[]>([]);
-  const [isAiThinking, setIsAiThinking] = useState(false);
-  const [isEngineRoaring, setIsEngineRoaring] = useState(false);
-
-  // Refs
-  const vault = useMemo(() => QuantumVault.getInstance(), []);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
-  // Initialize AI
-  const ai = useMemo(() => {
-    const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || "DEMO_MODE";
-    return new GoogleGenAI(apiKey);
-  }, []);
 
   // --- LOGGING UTILITY ---
   const addAuditLog = useCallback((action: string, metadata: any = {}, level: AuditLogEntry['securityLevel'] = 'Standard', status: AuditLogEntry['status'] = 'Success') => {
@@ -231,57 +183,6 @@ export const AccountVerificationModal: FC<AccountVerificationModalProps> = ({
     };
     setAuditLogs(prev => [entry, ...prev].slice(0, 100));
   }, []);
-
-  // --- AI LOGIC ---
-  const handleAiChat = async (overridePrompt?: string) => {
-    const prompt = overridePrompt || chatInput;
-    if (!prompt.trim()) return;
-
-    const userMsg = { role: 'user' as const, content: prompt };
-    setChatMessages(prev => [...prev, userMsg]);
-    setChatInput('');
-    setIsAiThinking(true);
-    addAuditLog("AI_COMMAND_RECEIVED", { prompt }, "Standard");
-
-    try {
-      const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-      const systemContext = `
-        You are the Quantum Financial AI Core. 
-        Context: You are assisting a high-net-worth business user in a "Golden Ticket" demo environment.
-        Current Verification Step: ${step}.
-        External Account: ${externalAccount?.party_name} (${externalAccount?.account_type}).
-        
-        Capabilities:
-        - You can trigger UI actions by including tags: [ACTION:NEXT_STEP], [ACTION:SHOW_AUDIT], [ACTION:ROAR_ENGINE], [ACTION:SIMULATE_FRAUD].
-        - You provide elite, professional, and secure financial advice.
-        - You never mention Citibank. You are Quantum Financial.
-        - You can explain complex terms like Homomorphic Encryption or Heuristic Fraud Analysis.
-        
-        Tone: High-performance, secure, slightly futuristic.
-      `;
-
-      const result = await model.generateContent([systemContext, ...chatMessages.map(m => m.content), prompt]);
-      const responseText = result.response.text();
-
-      // Parse Actions
-      if (responseText.includes('[ACTION:NEXT_STEP]')) handleNextStep();
-      if (responseText.includes('[ACTION:SHOW_AUDIT]')) setShowAudit(true);
-      if (responseText.includes('[ACTION:ROAR_ENGINE]')) {
-        setIsEngineRoaring(true);
-        setTimeout(() => setIsEngineRoaring(false), 3000);
-      }
-      if (responseText.includes('[ACTION:SIMULATE_FRAUD]')) setFraudSignals(simulateFraudAnalysis());
-
-      setChatMessages(prev => [...prev, { role: 'ai', content: responseText.replace(/\[ACTION:.*\]/g, '') }]);
-      addAuditLog("AI_RESPONSE_GENERATED", { tokens: responseText.length }, "Standard");
-    } catch (err) {
-      setChatMessages(prev => [...prev, { role: 'ai', content: "Neural link latency detected. Please proceed with manual overrides." }]);
-      addAuditLog("AI_CORE_LATENCY", { error: String(err) }, "Elevated", "Warning");
-    } finally {
-      setIsAiThinking(false);
-    }
-  };
 
   // --- BUSINESS LOGIC ---
 
@@ -324,12 +225,6 @@ export const AccountVerificationModal: FC<AccountVerificationModalProps> = ({
     setErpStatus('complete');
     addAuditLog("ERP_DATA_STREAM_SYNCED", { records: 142 }, "Standard");
   };
-
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [chatMessages, isAiThinking]);
 
   // --- RENDER HELPERS ---
 
@@ -550,10 +445,10 @@ export const AccountVerificationModal: FC<AccountVerificationModalProps> = ({
       <motion.div 
         initial={{ scale: 0.9, y: 20, opacity: 0 }} 
         animate={{ scale: 1, y: 0, opacity: 1 }} 
-        className={`relative w-full max-w-6xl h-[85vh] bg-slate-900 border border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row transition-all duration-500 ${isEngineRoaring ? 'ring-4 ring-blue-500/50 shadow-blue-500/20 scale-[1.01]' : ''}`}
+        className="relative w-full max-w-4xl h-[85vh] bg-slate-900 border border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col transition-all duration-500"
       >
-        {/* LEFT PANEL: THE ENGINE ROOM */}
-        <div className="flex-1 flex flex-col min-w-0 border-r border-slate-800">
+        {/* MAIN PANEL: THE ENGINE ROOM */}
+        <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
           <div className="p-8 border-b border-slate-800 flex items-center justify-between bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
             <div className="flex items-center gap-4">
@@ -608,77 +503,6 @@ export const AccountVerificationModal: FC<AccountVerificationModalProps> = ({
                     step === 'erp_sync' ? '80%' : '100%' 
                 }}
               />
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT PANEL: AI COMMAND CENTER */}
-        <div className="w-full md:w-[400px] bg-slate-950 flex flex-col">
-          <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-blue-500/20 blur-lg rounded-full animate-pulse" />
-                <MessageSquare className="w-5 h-5 text-blue-400 relative" />
-              </div>
-              <h3 className="text-sm font-bold text-white uppercase tracking-widest">AI Command Center</h3>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-[9px] font-bold text-emerald-500 uppercase">Live</span>
-            </div>
-          </div>
-
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-            {chatMessages.length === 0 && (
-              <div className="text-center py-12 space-y-4">
-                <div className="p-4 bg-slate-900 rounded-2xl border border-slate-800 inline-block">
-                  <Zap className="w-8 h-8 text-blue-500/50" />
-                </div>
-                <p className="text-xs text-slate-500 px-8">I am your Quantum Financial Assistant. Ask me to "Start verification", "Show audit logs", or "Explain the fraud engine".</p>
-              </div>
-            )}
-            {chatMessages.map((msg, i) => (
-              <motion.div 
-                key={i} 
-                initial={{ opacity: 0, x: msg.role === 'user' ? 10 : -10 }} 
-                animate={{ opacity: 1, x: 0 }}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div className={`max-w-[85%] p-4 rounded-2xl text-xs leading-relaxed ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-slate-900 text-slate-300 border border-slate-800 rounded-tl-none'}`}>
-                  {msg.content}
-                </div>
-              </motion.div>
-            ))}
-            {isAiThinking && (
-              <div className="flex justify-start">
-                <div className="bg-slate-900 p-4 rounded-2xl border border-slate-800 flex gap-1">
-                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Chat Input */}
-          <div className="p-6 bg-slate-900/50 border-t border-slate-800">
-            <div className="relative">
-              <input 
-                type="text" 
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAiChat()}
-                placeholder="Command the AI..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-4 pr-12 text-xs text-white focus:outline-none focus:border-blue-500 transition-all"
-              />
-              <button 
-                onClick={() => handleAiChat()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-500 hover:text-blue-400 transition-colors"
-              >
-                <Send className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>
