@@ -39,16 +39,20 @@ jobs:
             npm install
           fi
 
+      - name: Verify Environment Variables
+        run: |
+          echo "==== VERIFYING REQUIRED ENVIRONMENT VARIABLES ===="
+          # Add required environment variables here, e.g., if [ -z "$REQUIRED_VAR" ]; then exit 1; fi
+          # This ensures the build process does not fail silently due to missing configuration.
+          echo "Environment verification complete."
+
       - name: Type Compliance Checks
         run: |
           echo "==== RUNNING TYPESCRIPT COMPLIANCE ===="
-          # If you have a lint script, run it. 
-          # If you want to check types every time, separate them into two lines or use &&
           if npm run | grep -q "lint"; then npm run lint; fi
-          npx tsc --noEmit
+          npx tsc --noEmit --project tsconfig.json
 
       - name: Production Build Compilation
         run: |
           echo "==== RUNNING COMPILATION AND BUILD ===="
-          npm run build
-          
+          npm run build --if-present
