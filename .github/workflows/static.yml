@@ -34,10 +34,7 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        # You demanded npm install. Here it is. 
-        # This will bypass the EUSAGE error because it won't check 
-        # if your lockfile is perfectly synced.
-        run: npm install
+        run: npm ci
 
       - name: Verify Environment Variables
         env:
