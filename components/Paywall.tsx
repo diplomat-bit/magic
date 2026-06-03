@@ -257,6 +257,9 @@ const Paywall: React.FC<PaywallProps> = ({ details, onUnlock }) => {
   // Modal States
   const [showWireModal, setShowWireModal] = useState(false);
   const [wireDetails, setWireDetails] = useState({ recipient: '', amount: '' });
+  
+  // Stripe Redirect State
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   // --- LOGGING SYSTEM ---
   const addLog = useCallback((action: string, status: AuditLogEntry['status'], details: string) => {
@@ -343,6 +346,57 @@ const Paywall: React.FC<PaywallProps> = ({ details, onUnlock }) => {
         setWireDetails({ recipient: '', amount: '' });
       }, 1200);
     }, 800);
+  };
+
+  // --- STRIPE INTEGRATION ---
+  const handleUnlock = async () => {
+    setIsRedirecting(true);
+    addLog('SYSTEM', 'PENDING', 'Initiating secure checkout session...');
+    
+    try {
+      const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || process.env.STRIPE_PRICE_ID || '';
+      const secretKey = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || '';
+
+      if (!priceId || !secretKey) {
+        addLog('SYSTEM', 'FAILED', 'Stripe credentials missing. Using fallback unlock.');
+        onUnlock();
+        setIsRedirecting(false);
+        return;
+      }
+
+      const params = new URLSearchParams();
+      params.append('success_url', window.location.href);
+      params.append('cancel_url', window.location.href);
+      params.append('line_items[0][price]', priceId);
+      params.append('line_items[0][quantity]', '1');
+      params.append('mode', 'payment');
+
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${secretKey}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params.toString()
+      });
+
+      const session = await response.json();
+
+      if (session.url) {
+        addLog('SYSTEM', 'SUCCESS', 'Redirecting to Stripe hosted checkout...');
+        window.location.href = session.url;
+      } else {
+        addLog('SYSTEM', 'FAILED', 'Failed to create checkout session.');
+        console.error("Failed to create session", session);
+        onUnlock();
+        setIsRedirecting(false);
+      }
+    } catch (error) {
+      addLog('SYSTEM', 'FAILED', 'Error communicating with payment gateway.');
+      console.error("Error creating Stripe session:", error);
+      onUnlock();
+      setIsRedirecting(false);
+    }
   };
 
   // --- RENDER ---
@@ -524,10 +578,11 @@ const Paywall: React.FC<PaywallProps> = ({ details, onUnlock }) => {
       <div className="mt-12 text-center">
         <div className="inline-block p-[1px] rounded-xl bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500">
           <button 
-            onClick={onUnlock} 
-            className="px-12 py-4 bg-gray-900 rounded-xl text-white font-bold text-lg hover:bg-gray-800 transition-all active:scale-95 flex items-center gap-3"
+            onClick={handleUnlock} 
+            disabled={isRedirecting}
+            className="px-12 py-4 bg-gray-900 rounded-xl text-white font-bold text-lg hover:bg-gray-800 transition-all active:scale-95 flex items-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            <span>Unlock Full Platform Access</span>
+            <span>{isRedirecting ? 'Redirecting to Secure Checkout...' : 'Unlock Full Platform Access'}</span>
             <Icons.Zap />
           </button>
         </div>
