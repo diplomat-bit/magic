@@ -269,6 +269,9 @@ const SAppLayout = () => {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const renderView = () => {
+    if (!isSubscribed) {
+      return <Paywall />;
+    }
     switch (activeView) {
       case View.Dashboard: return <Dashboard />;
       case View.Transactions: return <TransactionsView />;
@@ -482,7 +485,7 @@ const SAppLayout = () => {
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-10 custom-scrollbar bg-[radial-gradient(circle_at_50%_0%,#111,transparent)]">
           <div className="max-w-[1600px] mx-auto h-full min-h-0">
-            {!isSubscribed ? <Paywall /> : renderView()}
+            {renderView()}
           </div>
         </main>
         <MonetizationOverlay />
