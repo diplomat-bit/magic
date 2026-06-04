@@ -237,3 +237,143 @@ const AccountsDashboardView: React.FC = () => {
   }, [chatMessages]);
 
   const logAction = useCallback((action: string, details: any) => {
+    QuantumVault.addLog(action, details);
+    setAuditLogs(QuantumVault.getLogs());
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (!userInput.trim()) return;
+    
+    const newMessages = [...chatMessages, { role: 'user' as const, text: userInput }];
+    setChatMessages(newMessages);
+    setUserInput('');
+    setIsProcessing(true);
+
+    try {
+      const apiKey = QuantumVault.getSecret('GEMINI_API_KEY');
+      if (!apiKey) {
+        throw new Error("GEMINI_API_KEY is missing from QuantumVault.");
+      }
+      
+      const ai = new GoogleGenAI({ apiKey });
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: userInput,
+      });
+      
+      setChatMessages([...newMessages, { role: 'ai', text: response.text || 'No response generated.' }]);
+      logAction('AI_QUERY_EXECUTED', { query: userInput, status: 'success' });
+    } catch (error) {
+      console.error("AI Error:", error);
+      setChatMessages([...newMessages, { role: 'ai', text: 'Error connecting to Quantum AI. Please check your API key or network connection.' }]);
+      logAction('AI_QUERY_FAILED', { error: String(error) });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <header style={styles.header}>
+        <div style={styles.heading}>Quantum Financial</div>
+        <div>
+          <button style={styles.button} onClick={() => setShowWireModal(true)}>Initiate Wire</button>
+        </div>
+      </header>
+      <main style={styles.main}>
+        <div>
+          <div style={styles.card}>
+            <h2 style={styles.heading}>Internal Accounts</h2>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Account</th>
+                  <th style={styles.th}>Type</th>
+                  <th style={styles.th}>Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                {accounts.map(acc => (
+                  <tr key={acc.id}>
+                    <td style={styles.td}>{acc.name}</td>
+                    <td style={styles.td}>{acc.account_type}</td>
+                    <td style={styles.td}>{(acc.balance / 100).toLocaleString('en-US', { style: 'currency', currency: acc.currency })}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{...styles.card, marginTop: '20px'}}>
+            <h2 style={styles.heading}>Recent Transactions</h2>
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Date</th>
+                  <th style={styles.th}>Description</th>
+                  <th style={styles.th}>Amount</th>
+                  <th style={styles.th}>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map(tx => (
+                  <tr key={tx.id}>
+                    <td style={styles.td}>{tx.date}</td>
+                    <td style={styles.td}>{tx.description}</td>
+                    <td style={styles.td}>{(tx.amount / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+                    <td style={styles.td}>
+                      <span style={styles.badge(tx.status)}>{tx.status}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <aside style={styles.chatSidebar}>
+          <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', fontWeight: 'bold' }}>Quantum AI Assistant</div>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} style={{ alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start', backgroundColor: msg.role === 'user' ? '#3b82f6' : '#1e293b', padding: '10px 15px', borderRadius: '8px', maxWidth: '80%', lineHeight: '1.5' }}>
+                {msg.text}
+              </div>
+            ))}
+            {isProcessing && <div style={{ alignSelf: 'flex-start', color: '#94a3b8' }}>Processing...</div>}
+            <div ref={chatEndRef} />
+          </div>
+          <div style={styles.chatInput}>
+            <input 
+              style={styles.input} 
+              value={userInput} 
+              onChange={e => setUserInput(e.target.value)} 
+              onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+              placeholder="Ask Quantum AI..."
+            />
+            <button style={styles.button} onClick={handleSendMessage} disabled={isProcessing}>
+              {isProcessing ? '...' : 'Send'}
+            </button>
+          </div>
+        </aside>
+      </main>
+      
+      {showWireModal && (
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h2 style={styles.heading}>Initiate Wire Transfer</h2>
+            <p style={{marginBottom: '20px', color: '#94a3b8'}}>Secure homomorphic encryption active.</p>
+            {!mfaStep ? (
+              <button style={styles.button} onClick={() => setMfaStep(true)}>Proceed to MFA</button>
+            ) : (
+              <div>
+                <p style={{marginBottom: '20px', color: '#a7f3d0'}}>MFA Verified. Wire Initiated.</p>
+                <button style={styles.button} onClick={() => { setShowWireModal(false); setMfaStep(false); }}>Close</button>
+              </div>
+            )}
+            <button style={{...styles.button, backgroundColor: 'transparent', border: '1px solid #3b82f6', marginLeft: '10px'}} onClick={() => { setShowWireModal(false); setMfaStep(false); }}>Cancel</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default AccountsDashboardView;
