@@ -52,7 +52,7 @@ const DemoBankFleetManagementView: React.FC = () => {
         <div className="space-y-6">
             <h2 className="text-3xl font-bold text-white tracking-wider">Demo Bank Fleet Management</h2>
             <Card title="AI Route Optimizer">
-                <p className="text-gray-400 mb-4">Enter a list of delivery addresses or waypoints, separated by "->".</p>
+                <p className="text-gray-400 mb-4">Enter a list of delivery addresses or waypoints, separated by &quot;-&gt;&quot;.</p>
                 <textarea
                     value={prompt}
                     onChange={e => setPrompt(e.target.value)}
