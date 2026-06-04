@@ -1,63 +1,44 @@
-// lib/apiClient.ts
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-const BASE_URL = '/api'; // This assumes your API routes are at /api/...
-
-async function handleResponse(response: Response) {
+const handleResponse = async (response: Response) => {
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || 'API request failed');
+    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+    throw new Error(errorData.message || 'An unexpected error occurred.');
   }
-  
-  // Return null for 204 No Content (common for DELETE)
-  if (response.status === 204) return null;
-  
   return response.json();
-}
+};
 
 export const apiClient = {
-  // GET request
-  async get(endpoint: string) {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+  get: async <T>(path: string, config?: RequestInit): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${path}`, { ...config, method: 'GET' });
     return handleResponse(response);
   },
-
-  // POST request
-  async post(endpoint: string, data: any) {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+  post: async <T>(path: string, body: any, config?: RequestInit): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${path}`, {
+      ...config,
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        ...(config?.headers || {}),
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     });
     return handleResponse(response);
   },
-
-  // DELETE request
-  async delete(endpoint: string) {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return handleResponse(response);
-  },
-
-  // PUT request (if you need it later)
-  async put(endpoint: string, data: any) {
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
+  put: async <T>(path: string, body: any, config?: RequestInit): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${path}`, {
+      ...config,
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        ...(config?.headers || {}),
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     });
     return handleResponse(response);
-  }
+  },
+  delete: async <T>(path: string, config?: RequestInit): Promise<T> => {
+    const response = await fetch(`${BASE_URL}${path}`, { ...config, method: 'DELETE' });
+    return handleResponse(response);
+  },
 };
