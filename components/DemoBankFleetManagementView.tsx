@@ -1,6 +1,6 @@
 // components/views/platform/DemoBankFleetManagementView.tsx
 import React, { useState, useEffect, useMemo, useCallback, useRef, useReducer, createContext, useContext } from 'react';
-import Card from '../../Card';
+import Card from './Card';
 import { GoogleGenAI, Type } from "@google/genai";
 
 // SECTION 1: TYPES & INTERFACES =======================================================
