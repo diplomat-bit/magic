@@ -137,4 +137,4 @@ import SalesPipelineView from './views/megadashboard/business/SalesPipelineView'
 import MarketingAutomationView from './views/megadashboard/business/MarketingAutomationView';
 import GrowthInsightsView from './views/megadashboard/business/GrowthInsightsView';
 import CompetitiveIntelligenceView from './views/megadashboard/business/CompetitiveIntelligenceView';
-import BenchmarkingView from './views/megadashboard
+import BenchmarkingView from './views/megadashboard/business/BenchmarkingView';
