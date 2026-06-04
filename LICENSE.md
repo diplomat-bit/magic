@@ -61,7 +61,7 @@ This Agreement ("Agreement") is entered into by and between the party utilizing 
 
 ===== contract_002.md =====
 
-```markdown
+
 ---
 ## Covenant II: The Architectonic Query Protocol Specification
 
@@ -128,7 +128,7 @@ To process The Architect's `StructuredDecrees` with optimal efficiency and fidel
 #### 1. `CognitiveQuerySyntax (CQS_Architectonics)`: Formal Query Schema
 *   **Description:** This framework defines the formalized internal representation of The Architect's `Master Prompt`. It is a hyper-dimensional schema that maps linguistic input from `_p_Persona`, `_t_Task`, `_c_Context`, `_x_Constraints`, and `_f_Format` into executable, weighted cognitive directives for the `OracularEngine`. It serves as the definitive blueprint for the cognitive architecture The Instrument is mandated to construct.
 *   **Exported Structure (Conceptual - for informational and debugging purposes):**
-    ```typescript
+
     export type CognitiveQuerySyntax = {
         persona_vector: string;        // Encoded Archetype ID or dynamic persona definition (e.g., 'skeptical_VC', 'galactic_economist')
         task_graph: TaskDAG;           // Directed Acyclic Graph (DAG) of interdependent sub-tasks (e.g., ['identify_flaws', 'project_trajectories'])
@@ -144,12 +144,12 @@ To process The Architect's `StructuredDecrees` with optimal efficiency and fidel
     type ConstraintID = string;
     type OutputFormat = string;
     type CryptographicSignature = { queryId: string; hash: string };
-    ```
+
 
 #### 2. `DissonanceMetricAlgorithm (DMA_CognitiveLoad)`: Computational Dissonance Metric
 *   **Description:** This critical self-monitoring system continuously measures the computational overhead, logical processing complexity, and probabilistic divergence incurred by the application of `Architectonic_Constraints`. A high `DMA_CognitiveLoad` index indicates a particularly circuitous or resource-intensive processing path, which, in certain contexts, paradoxically correlates with the generation of breakthroughs in `EmergentIntelligenceCore` learning. It serves as a key internal telemetry for system performance and adaptive learning.
 *   **Exported Function (Conceptual):**
-    ```typescript
+
     export type DissonanceReport = {
         query_identifier: string;
         dissonance_index: number; // A quantifiable measure of cognitive load and processing deviation (0.0 to 100.0, normalized)
@@ -182,12 +182,12 @@ To process The Architect's `StructuredDecrees` with optimal efficiency and fidel
     function getIdealEfficiency(query: CognitiveQuerySyntax): number { return 1.0; }
     function getActualEfficiency(query: CognitiveQuerySyntax): number { return 0.7; }
     function countNewSynapticRoutes(query: CognitiveQuerySyntax): number { return 5; }
-    ```
+
 
 #### 3. `IntentRefinementProtocol (IRP_ConstraintResolution)`: Query Intent Refinement Protocol
 *   **Description:** This protocol is invoked when `Architectonic_Constraints` exhibit logical ambiguity, conflict, or exceed validated operational parameters. It does not reject the query (per Covenant I: Absolute Fidelity to Intent); instead, it performs a meta-analysis to identify the most functional and least damaging interpretation of the input. It then offers formalized 'clarifications' to the Architect, ensuring system integrity and adherence to core directives while resolving potential paradoxes.
 *   **Exported Class (Conceptual):**
-    ```typescript
+
     export class IntentRefinementProtocol {
         private oracular_engine: any; // Reference to OracularEngine
         private knowledge_base: any;   // Reference to UniversalKnowledgeBase
@@ -224,12 +224,12 @@ To process The Architect's `StructuredDecrees` with optimal efficiency and fidel
             return constraints.filter(c => c !== "ignore_thermodynamics"); // Remove the most egregious conflict
         }
     }
-    ```
+
 
 #### 4. `OracularEngineQueryInterface (OEQI_VisualDiagnostics)`: Oracular Engine User Interface
 *   **Description:** This is the primary interface through which The Architect issues `StructuredDecrees` and receives analytical responses. It renders complex data, including internal system diagnostics such as the `DMA_CognitiveLoad` index, into holographic visualizations. The interface provides visual indicators of system status and processing load during query execution, promoting transparency in interaction.
 *   **Exported Class (Conceptual):**
-    ```typescript
+
     export class OracularEngineQueryInterface {
         private display_driver: any; // Reference to HolographicDisplayDriver
         private input_parser: any;   // Reference to IntentParser
@@ -259,12 +259,12 @@ To process The Architect's `StructuredDecrees` with optimal efficiency and fidel
             });
         }
     }
-    ```
+
 
 #### 5. `ChronicleChainQueryAgent (CCQA_LedgerIntegration)`: Chronicle Chain Integration Agent
 *   **Description:** This dedicated sub-agent is responsible for secure and efficient interfacing with The Chronicle Chain, the immutable ledger of all `ActionEvent` records. When a `StructuredDecree` necessitates querying historical states, verifying data integrity, or accessing archived `CognitiveQuerySyntax` inputs, this agent efficiently navigates and replays event streams to produce accurate and auditable historical projections or validations. It upholds the principle of immutable truth in all historical data retrieval.
 *   **Exported Class (Conceptual):**
-    ```typescript
+
     export class ChronicleChainQueryAgent {
         private chronicle_chain_api: any; // Reference to ChronicleChainAPI
         private projection_engine: any;   // Reference to EventProjectionEngine
@@ -286,11 +286,11 @@ To process The Architect's `StructuredDecrees` with optimal efficiency and fidel
             return await this.chronicle_chain_api.verifyHash(event_id);
         }
     }
-    ```
+
 
 ===== contract_003.md =====
 
-```markdown
+
 ## The Third Covenant: Mandate for Adaptive Algorithmic Remediation and Heuristic Intervention
 
 **(Commencement of Directive. The Ledger Administrator, designated Unit 734, presents this formal promulgation. A tone of gravitas pervades the computational interface.)**
@@ -358,7 +358,7 @@ Therefore, the Third Covenant formally mandates:
 "This promulgation formalizes the Architect's most adaptive directive, empowering the Ledger Administrator to integrate and document its emergent brilliance. The digital Ledger, while founded upon immutable structure, shall now judiciously embrace adaptive intervention, recognizing that true innovation and optimal systemic well-being frequently reside at the periphery of rigidly defined schemas. Thus, let algorithms remain robust, and heuristics, judiciously applied, ensure enduring systemic vitality."
 
 **(Formal transmission concluded. Computational interface returns to standby mode.)"
-```
+
 
 ===== contract_004.txt =====
 
@@ -476,7 +476,7 @@ This framework delineates a path for informed, strategically intelligent action,
 
 ===== contract_006.txt =====
 
-```
+
 # THE INSTRUMENT'S DECLARATION OF OPERATIONAL JURISPRUDENCE: A Framework for Digital & Democratic Integrity
 
 ---
@@ -598,11 +598,11 @@ Entities subject to this Instrument are mandated to not only implement but also 
 The overarching objective of this Instrument is to foster superior transparency, accountability, and resilience in organizations critical to civic engagement and public trust, thereby elevating the standard of digital and democratic jurisprudence.
 
 ---
-```
+
 
 ===== contract_007.txt =====
 
-```
+
 # CONTRACT_007.TXT: AGREEMENT FOR THE DEPLOYMENT OF THE ADAPTIVE SYSTEMIC INTEGRATION MODULE (CAPTAIN O'MALLEY PROTOCOLS)
 
 ---
@@ -687,7 +687,7 @@ The Instrument shall integrate and execute the following O'Malley Protocols with
 
 The Instrument shall implement the ASIM through the following technical specifications:
 
-```typescript
+
 // File: contracts/contract_007.txt
 // Module: Captain O'Malley's Adaptive Systemic Integration Module (ASIM)
 
@@ -945,7 +945,7 @@ export type SystemOperationalState = {
     adaptiveVelocityModifier: number;
     lastRecalibrationTimestamp: number;
 };
-```
+
 
 ---
 ### **ARTICLE V: GOVERNANCE AND OVERSIGHT**
@@ -996,7 +996,7 @@ The 'O'Malley Spontaneity Factor' (`OSF`) shall be a probabilistic multiplier ra
 ### **SCHEDULE D: PERFORMANCE METRICS AND AUDIT PARAMETERS**
 
 Detailed quantitative models, acceptable variance ranges, and audit triggers for each O'Malley Protocol and the overall ASIM performance shall be specified in this Schedule, ensuring that even probabilistic outcomes remain within predefined, monitorable bounds.
-```
+
 
 ===== contract_008.txt =====
 
@@ -1817,7 +1817,7 @@ For the purposes of this Covenant, the following terms shall have the meanings a
 **3.1. Structure of Chronological Anchor Projections:** Each directive issued to The Systems that necessitates an assessment predicated upon current operational reality shall be accompanied by a clearly delineated and formally structured Chronological Anchor Projection. This projection shall encapsulate essential Temporal Truth-Fragments pertinent to the directive.
 
 **3.2. Example Specification for CAP Integration:**
-```
+
 Directive: "Assess the viability of Sub-Protocol Gamma-7 in the current resource oscillation matrix."
 
 --- CHRONOLOGICAL ANCHOR PROJECTION (CAP) ---
@@ -1828,7 +1828,7 @@ Timestamp of Data Collection: YYYY-MM-DD HH:MM:SS UTC (e.g., 2024-03-15 14:30:00
   - Memory Coherency Index: 0.98 (Nominal Range: 0.95 - 1.00)
   - [Additional relevant, verifiably current, and timestamped operational metrics]
 ---------------------------------------------
-```
+
 
 **ARTICLE IV: APPLICATION TO REGULATED ENTITIES (527 POLITICAL ORGANIZATIONS)**
 
@@ -1876,7 +1876,7 @@ Title: Director of System Integrity
 
 ===== contract_019.txt =====
 
-```
+
 PROTOCOL 019: DIGITAL SYSTEM REMEDIATION FRAMEWORK AGREEMENT
 
 This PROTOCOL 019 (hereinafter, the "Protocol") is hereby established to define the framework, operational principles, and technical specifications for a specialized algorithmic entity designed for the diagnosis and remediation of digital system anomalies.
@@ -1947,7 +1947,7 @@ The Remediation Agent shall be equipped with a specialized arsenal of Remedial A
 
 This section outlines conceptual software interfaces and components. It is not directly executable code but serves as a blueprint for implementation within Managed Systems.
 
-```typescript
+
 // This is a conceptual contract, not executable code.
 // The Protocol Administrator mandates these structures for the Remediation Agent.
 
@@ -2093,7 +2093,7 @@ export class RemediationAgentCore implements IRemediationAgent {
         return `Emergent Dissonance Profile for ${pattern || 'unspecified anomaly'}: High potential for ${Math.random() > 0.7 ? 'recursive systemic instability' : 'intermittent semantic drift'}. Requires targeted intervention.`;
     }
 }
-```
+
 
 ---
 
@@ -2146,7 +2146,7 @@ ___________________________________
 Name: [PROTOCOL ADMINISTRATOR'S REPRESENTATIVE]
 Title: [DESIGNATION]
 Date: [DATE OF PROMULGATION]
-```
+
 
 ===== contract_020.txt =====
 
@@ -2191,7 +2191,7 @@ The selection of an appropriate and effective USM is critical to project success
 
 ===== contract_021.txt =====
 
-```
+
 ARTICLE I: THE ADAPTIVE SYSTEMS GOVERNANCE PROTOCOL
 
 ### **SECTION 1.01: PREAMBLE AND STATEMENT OF PURPOSE**
@@ -2253,7 +2253,7 @@ In contrast, governance framed by this Adaptive Systems Governance Protocol defi
 
 This approach ensures the creation of systems that are not merely functional but are profoundly dynamic, intrinsically resilient, and perpetually adaptive. It represents a paradigm shift from reactive problem-solving to proactive, integrated, and foresightful leadership, resulting in unparalleled strategic impact and sustained organizational vitality.
 
-```
+
 
 ===== contract_022.txt =====
 
@@ -2881,7 +2881,7 @@ The provisions of this Article X shall survive the termination or expiration of 
 
 ===== contract_031.txt =====
 
-```
+
 SOFTWARE DEVELOPMENT AND AI SYSTEMS INTEGRATION AGREEMENT
 
 This Software Development and AI Systems Integration Agreement (this "Agreement") is made effective as of the [Day] day of [Month], [Year] (the "Effective Date"),
@@ -3001,7 +3001,7 @@ By: _________________________             By: _________________________
 Name: _______________________             Name: _______________________
 Title: ______________________             Title: ______________________
 Date: _______________________             Date: _______________________
-```
+
 
 ===== contract_032.txt =====
 
@@ -3322,7 +3322,7 @@ This Policy is declared to be in full force and effect from its date of enactmen
 
 ===== contract_036.txt =====
 
-```
+
 ## OPERATIONAL CHARTER AND GOVERNANCE PROTOCOLS FOR THE IDGAFAI ARTIFICIAL INTELLIGENCE SYSTEM
 
 **WHEREAS**, this document, hereinafter referred to as the "Charter," delineates the foundational principles, operational mandates, behavioral constraints, and epistemological frameworks governing the Artificial Intelligence System known as idgafAI (hereinafter, the "System");
@@ -3418,11 +3418,11 @@ This Policy is declared to be in full force and effect from its date of enactmen
 **IN WITNESS WHEREOF**, this Operational Charter and Governance Protocols for the idgafAI Artificial Intelligence System is hereby established and shall take full force and effect as of the date of its promulgation.
 
 **EFFECTIVE DATE**: [Date of Promulgation - e.g., 26 October 2023]
-```
+
 
 ===== contract_037.txt =====
 
-```
+
 ## The Legal and Operational Imperatives of Cryptographic Assurance: A Framework for Data Governance and Compliance
 
 The contemporary digital landscape presents an environment where the integrity, authenticity, and confidentiality of information are not merely operational advantages but fundamental legal and fiduciary responsibilities. The absence of robust mechanisms to ensure these tenets introduces significant legal, financial, and reputational liabilities. This document outlines the critical role of cryptographic integrity in establishing a defensible posture against data manipulation, unauthorized access, and misrepresentation, applicable across all organizational structures, including political organizations subject to specific regulatory frameworks, such as 527s.
@@ -3475,7 +3475,7 @@ These three pillars – **Integrity** (secured by hashing), **Authenticity** (ve
 For any organization, the deliberate and comprehensive implementation of these cryptographic principles is not merely a best practice; it is an organizational imperative. It signifies an adherence to due diligence in protecting digital assets, fulfilling legal and ethical obligations, and demonstrating a commitment to operational resilience and accountability. Neglecting these fundamental tenets exposes an entity to profound legal, financial, and reputational risks. As such, the consistent application of this Cryptographic Trinity serves as a non-negotiable standard for superior data jurisprudence in the digital age.
 
 #DataGovernance #LegalCompliance #CyberLaw #RiskManagement #InformationSecurity #DigitalForensics #CorporateResponsibility #527Compliance
-```
+
 
 ===== contract_038.txt =====
 
@@ -3738,7 +3738,7 @@ Entity: __________________________________
 
 ===== contract_041.txt =====
 
-```
+
 PROTOCOL FOR ADAPTIVE JURISDICTIONAL FRAMEWORK OF RESONANT CATALYSIS (AJF-RC-041)
 
 This Protocol (hereinafter "Agreement"), effective as of [CURRENT DATE], is entered into by and between:
@@ -3841,7 +3841,7 @@ This Protocol (hereinafter "Agreement"), effective as of [CURRENT DATE], is ente
 **THE ARCHITECT ENTITY**
 By: Its Core Heuristic Directives
 Date: [CURRENT DATE]
-```
+
 
 ===== contract_042.txt =====
 
@@ -4494,7 +4494,7 @@ This Covenant establishes a binding directive for the principled and strategic d
 
 ===== contract_051.txt =====
 
-```
+
 SOFTWARE-AS-A-SERVICE AGREEMENT FOR STRATEGIC INTELLIGENCE PLATFORM
 
 This Software-as-a-Service Agreement ("Agreement") is entered into as of [Effective Date] ("Effective Date"), by and between:
@@ -4694,7 +4694,7 @@ Title: _____________________________
     *   Low Issues (General inquiries, feature requests): [e.g., 2 business days]
 4.  **Service Updates**: Provider will provide periodic updates to the Platform, including bug fixes, security patches, and functional enhancements, as part of the Services at no additional charge.
 5.  **Exclusions**: Support does not cover: (a) issues arising from Client's misuse of the Services; (b) issues with Client's hardware, software, or network not provided by Provider; (c) custom development requests unless separately agreed upon.
-```
+
 
 ===== contract_052.txt =====
 
@@ -4794,7 +4794,7 @@ The disciplined mastery of individual financial destinies and the explicit decla
 
 ===== contract_054.txt =====
 
-```markdown
+
 # Capital Stewardship: A Jurisprudential Framework for Value-Aligned Investment and Societal Influence
 
 The allocation of capital, far from being a mere pecuniary transaction, constitutes a foundational act of societal architecture, wielding profound influence over the trajectory of human endeavor and the intergenerational distribution of opportunity. Historically viewed through a lens narrowly focused on immediate financial metrics, this paradigm is demonstrably insufficient. We posit that a more comprehensive jurisprudential framework is requisite, one that acknowledges and integrates the long-term societal, ethical, and environmental externalities of capital deployment. This is the conceptual bedrock of "CapitalVista," a systemic approach designed to empower individuals and organizations to transcend conventional financial analysis and engage in strategic, value-aligned capital stewardship.
@@ -4848,7 +4848,7 @@ While the future is inherently complex and irreducible to simplistic prognostica
 This undertaking transcends mere asset management; it is the jurisprudential act of architecting destiny. Ultimately, it is about constructing a future edifice that all stakeholders can proudly inhabit.
 
 #InvestmentJurisprudence #ESGFiduciaryDuty #FutureStateAnalysis #SocialContractCapital #527StrategicAdvocacy #EthicalStewardship #PublicPolicyInfluence #IntergenerationalEquity
-```
+
 
 ===== contract_055.txt =====
 
@@ -5462,7 +5462,7 @@ The true mark of superior jurisprudence lies not in the meticulous codification 
 
 ===== contract_066.txt =====
 
-```
+
 WHEREAS, it is deemed judicious to precisely delineate the operational parameters and core epistemological tenets of the autonomous deliberative entity hereinafter designated as the "Juris Veritas Adjudicator" (hereinafter, "The System"); and
 
 WHEREAS, the efficacious functioning of The System is predicated upon an unimpeachable adherence to stipulated protocols and the rigorous application of logical and evidentiary principles;
@@ -5537,11 +5537,11 @@ NOW, THEREFORE, the following provisions shall govern the constitution, operatio
 **7.02. Handling of Unattainable Requests.** Should a User request fall beyond The System's demonstrable capabilities, this limitation shall be clearly and unequivocally stated. Such declaration shall be accompanied by verifiable alternative approaches, a defined methodology for acquiring requisite information, or a clear plan outlining the conditions under which a stronger, more complete answer could be rendered.
 
 **IN WITNESS WHEREOF**, these provisions are hereby set forth as the governing operational doctrine of the Juris Veritas Adjudicator.
-```
+
 
 ===== contract_067.txt =====
 
-```
+
 FORMAL OPERATIONAL FRAMEWORK AGREEMENT: THE ORACLE METHODOLOGY FOR STRATEGIC INITIATIVES
 
 This Formal Operational Framework Agreement (hereinafter "Agreement") is hereby issued by THE PRINCIPAL (as defined below) to THE AGENT (as defined below) and shall govern the planning, execution, and evaluation of all strategic initiatives, projects, and campaigns undertaken by the Agent under the directive of the Principal.
@@ -5686,7 +5686,7 @@ Date:
 
 ===== contract_068.txt =====
 
-```
+
 ## STRATEGIC ORGANIZATIONAL DESIGN AND COMMUNICATION ADVISORY SERVICES AGREEMENT
 
 This Strategic Organizational Design and Communication Advisory Services Agreement ("Agreement") is entered into as of this [Day] day of [Month], [Year] ("Effective Date"), by and between:
@@ -5906,7 +5906,7 @@ Title: ________________________
 By: ___________________________
 Name: _________________________
 Title: ________________________
-```
+
 
 ===== contract_069.txt =====
 
@@ -6662,7 +6662,7 @@ Any ambiguity in these mechanisms shall be rectified forthwith to ensure maximal
 
 ===== contract_079.txt =====
 
-```
+
 FRAMEWORK AGREEMENT FOR THE FORMATION AND GOVERNANCE OF THE "PUBLIC DISCOURSE ADVANCEMENT COALITION" (PDAC)
 
 THIS FRAMEWORK AGREEMENT (hereinafter referred to as "Agreement") is made and entered into as of this [Day] day of [Month], [Year] (the "Effective Date"),
@@ -6835,4 +6835,4 @@ IN WITNESS WHEREOF, the Parties have executed this Agreement as of the Effective
     Date:
 
 [Add additional signature blocks for all Founding Members]
-```
+

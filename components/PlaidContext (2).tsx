@@ -1,4 +1,4 @@
-```typescript
+
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
 
@@ -515,4 +515,3 @@ export const PlaidProvider: React.FC<PlaidProviderProps> = ({ children, clientId
         </PlaidContext.Provider>
     );
 };
-```

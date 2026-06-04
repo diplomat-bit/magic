@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import Card from './Card';
 import { User, Shield, Lock, Mail, Link as LinkIcon, Database, Server, Wifi, Terminal, Settings2 } from 'lucide-react';
@@ -358,4 +358,3 @@ const SettingsView: React.FC = () => {
 };
 
 export default SettingsView;
-```

@@ -1,4 +1,4 @@
-```typescript
+
 import React from 'react';
 
 /**
@@ -317,4 +317,3 @@ A5_Button.displayName = "A5_Button"; // Explicitly set the display name for debu
 // D. Exporting the Component - The James Burvel O’Callaghan III Code.
 // Makes the component available for import in other modules.
 export { A5_Button };
-```

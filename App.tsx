@@ -18,6 +18,7 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import SApp from './components/SApp';
 import { View } from './types';
+import Paywall from './components/Paywall';
 
 // Views & Components
 import Dashboard from './components/Dashboard';
@@ -162,7 +163,7 @@ import WebhookSimulator from './components/WebhookSimulator';
 
 // --- FIXED Wrapper Components ---
 type WrapperProps = {
-  Component: React.FC<any>;
+  Component: React.ComponentType<any>;
   props?: any;
 };
 
@@ -181,7 +182,7 @@ const ModalWrapper: React.FC<WrapperProps> = ({ Component, props = {} }) => {
   );
 };
 
-const DataContextWrapper: React.FC<{ Component: React.FC<any>; extraProps?: any }> = ({ Component, extraProps = {} }) => {
+const DataContextWrapper: React.FC<{ Component: React.ComponentType<any>; extraProps?: any }> = ({ Component, extraProps = {} }) => {
   const dataContext = useContext(DataContext);
   const mockContext = {
     setActiveView: () => {},
@@ -226,7 +227,7 @@ const MonetizationOverlay = () => {
       <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
       <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Sovereign Balance:</span>
       <span className="text-cyan-400 font-mono text-lg font-bold tracking-tighter">
-        {sovereignCredits.toLocaleString()} SC
+        {typeof sovereignCredits === 'number' ? sovereignCredits.toLocaleString() : '0'} SC
       </span>
     </div>
   );
@@ -238,12 +239,14 @@ const SAppLayout = () => {
   const authContext = useContext(AuthContext);
 
   useEffect(() => {
-    datadogLogs.logger.info('App View Loaded', { name: 'SovereignNexus', id: 'init_view' });
+    if (datadogLogs && datadogLogs.logger) {
+      datadogLogs.logger.info('App View Loaded', { name: 'SovereignNexus', id: 'init_view' });
+    }
   }, []);
 
   if (!dataContext || !authContext) return null;
   const { isAuthenticated, isLoading: authLoading } = authContext;
-  const { isLoading: dataLoading, activeView, setActiveView } = dataContext;
+  const { isLoading: dataLoading, activeView, setActiveView, isSubscribed } = dataContext;
 
   if (authLoading || (isAuthenticated && dataLoading)) {
     return (
@@ -255,10 +258,10 @@ const SAppLayout = () => {
         <div className="w-80 h-1 bg-gray-900 rounded-full overflow-hidden">
           <div className="h-full bg-cyan-500 animate-progress-flow"></div>
         </div>
-        <style>{`
+        <style dangerouslySetInnerHTML={{ __html: `
           @keyframes flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
           .animate-progress-flow { animation: flow 2s linear infinite; width: 50%; }
-        `}</style>
+        ` }} />
       </div>
     );
   }
@@ -266,6 +269,9 @@ const SAppLayout = () => {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   const renderView = () => {
+    if (!isSubscribed) {
+      return <Paywall />;
+    }
     switch (activeView) {
       case View.Dashboard: return <Dashboard />;
       case View.Transactions: return <TransactionsView />;
@@ -328,7 +334,7 @@ const SAppLayout = () => {
       case View.StripeNexus: return <StripeNexusView />;
       case View.CounterpartyDashboard: return <CounterpartyDashboardView />;
       case View.VirtualAccounts: return <VirtualAccountsDashboard />;
-      case View.SApp: return <SAPP />;
+      case View.SApp: return <SApp />;
       case View.CorporateActions: return <CorporateActionsNexusView />;
       case View.CreditNoteLedger: return <CreditNoteLedger />;
       case View.ReconciliationHub: return <ReconciliationHubView />;

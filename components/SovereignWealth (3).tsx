@@ -1,4 +1,4 @@
-```typescript
+
 // components/SovereignWealth.tsx
 // The James Burvel O’Callaghan III Code - Citibank demo business inc
 // Maximalist, Hyper-Structured Software System

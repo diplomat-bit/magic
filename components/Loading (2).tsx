@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 
 // The James Burvel O'Callaghan III Code - Loading Component - Version 1.0
@@ -217,4 +217,3 @@ const OCallaghanLoadingZ1 = () => {
 
 const Loading = OCallaghanLoadingZ1;
 export default Loading;
-```

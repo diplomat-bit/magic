@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState } from 'react';
 import Card from './Card';
 
@@ -348,4 +348,3 @@ const TheVisionView: React.FC = () => {
 };
 
 export default TheVisionView;
-```

@@ -1,4 +1,4 @@
-```typescript
+
 "use client";
 import React from 'react';
 import { clsx, type ClassValue } from "clsx"
@@ -78,4 +78,3 @@ const TheJamesBurvelOCallaghanIIIProgressAnimatedQ = React.forwardRef<HTMLDivEle
     return (<div className={cn('w-full', { 'flex items-center': labelPosition === 'outside' })}> <TheJamesBurvelOCallaghanIIIAnimationStylesA /> <div className="relative w-full group"> <div ref={ref} role="progressbar" aria-valuenow={isIndeterminate ? undefined : A1aPercentage} aria-valuemin={min} aria-valuemax={max} aria-valuetext={isIndeterminate ? 'Loading...' : `${Math.round(A1aPercentage)}${labelUnit}`} className={cn("relative w-full overflow-hidden", A1eSizeClasses[size], A1fRadiusClasses[radius], trackColor.startsWith('bg-') ? trackColor : '', className)} style={A1vTrackStyle} {...props}> {isIndeterminate ? (A1uIndeterminateIndicator) : (<> {bufferValue != null && (<div className="absolute left-0 top-0 h-full bg-gray-500 opacity-30" style={A1iBufferStyle}/>)} <div className={A1tIndicatorClasses} style={A1hIndicatorStyle}/> </>)} {labelPosition === 'inside' && <TheJamesBurvelOCallaghanIIIProgressLabelR />} </div> {labelPosition === 'floating' && <TheJamesBurvelOCallaghanIIIProgressLabelR />} {showTooltip && <TheJamesBurvelOCallaghanIIITooltipS />} </div> {labelPosition === 'outside' && <TheJamesBurvelOCallaghanIIIProgressLabelR />} </div>);
 });
 TheJamesBurvelOCallaghanIIIProgressAnimatedQ.displayName = "TheJamesBurvelOCallaghanIIIProgressAnimated";
-```

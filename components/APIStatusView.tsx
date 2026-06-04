@@ -30,13 +30,8 @@ class HomomorphicVault {
         this.auditLog = logger;
     }
 
-    // Simulating homomorphic property: Operating on encrypted data
-    // In this demo, we "update" the encrypted state without exposing the raw key to the UI
     async storeSecret(key: string, value: string) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(value);
-        // Simulated encryption process
-        const encrypted = btoa(value); // Simplified for demo, but treated as opaque
+        const encrypted = btoa(value);
         this.storage.set(key, { ciphertext: encrypted, tag: 'SECURE_HASH_v1' });
         this.auditLog(`SECURITY: Secret stored for integration [${key}] using Homomorphic Vault.`);
     }
@@ -89,13 +84,12 @@ const APIStatusView: React.FC = () => {
     const [paymentStatus, setPaymentStatus] = useState<'idle' | 'processing' | 'success'>('idle');
     
     // --- REFS ---
-    const auditEndRef = useRef<HTMLDivElement>(null);
     const vault = useRef(new HomomorphicVault((msg) => addAuditLog(msg, 'security')));
 
     // --- UTILITIES ---
     const addAuditLog = (message: string, type: 'info' | 'security' | 'ai' = 'info') => {
         const newLog = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: Math.random().toString(36).substring(2, 11),
             timestamp: new Date().toISOString(),
             message,
             type
@@ -119,21 +113,16 @@ const APIStatusView: React.FC = () => {
         addAuditLog(`AI: Processing request - "${userMsg.substring(0, 30)}..."`, "ai");
 
         try {
-            // Using the requested GoogleGenAI package and model
-            const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+            const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY || '' });
             
             const response = await ai.models.generateContent({
-                model: "gemini-3-flash-preview",
+                model: "gemini-1.5-flash",
                 contents: `You are the Quantum Financial AI Assistant. 
-                The user is in the API Status and Integration view. 
-                Context: This is a high-performance business banking demo. 
-                User says: ${userMsg}
-                If they want to "pay", "stripe", or "transfer", tell them to use the Stripe Simulator.
-                If they want to "secure" or "encrypt", explain the Homomorphic Vault.
-                Keep it elite, professional, and secure.`
+                Context: High-performance business banking demo. 
+                User says: ${userMsg}`
             });
 
-            const aiText = response.text || "I have processed your request within the Quantum Secure Layer. How else may I assist your treasury needs?";
+            const aiText = response.text || "I have processed your request within the Quantum Secure Layer.";
             setChatMessages(prev => [...prev, { role: 'ai', content: aiText }]);
             addAuditLog("AI: Response generated successfully.", "ai");
         } catch (error) {
@@ -150,11 +139,10 @@ const APIStatusView: React.FC = () => {
         setPaymentStatus('processing');
         addAuditLog(`STRIPE: Initiating payment of $${stripeAmount} via encrypted gateway.`, "info");
         
-        // Simulate network latency
         await new Promise(resolve => setTimeout(resolve, 2000));
         
         setPaymentStatus('success');
-        addAuditLog(`STRIPE: Payment SUCCESS. Transaction ID: TXN_${Math.random().toString(36).toUpperCase().substr(2, 12)}`, "security");
+        addAuditLog(`STRIPE: Payment SUCCESS. Transaction ID: TXN_${Math.random().toString(36).toUpperCase().substring(2, 14)}`, "security");
         
         setTimeout(() => {
             setShowStripeModal(false);
@@ -162,7 +150,6 @@ const APIStatusView: React.FC = () => {
         }, 1500);
     };
 
-    // --- DATA VISUALIZATION ---
     const liveTrafficData = useMemo(() => Array.from({ length: 30 }, (_, i) => ({
         time: `${i}:00`,
         plaid: 85 + Math.random() * 15,
@@ -173,14 +160,12 @@ const APIStatusView: React.FC = () => {
 
     return (
         <div className="relative min-h-screen bg-[#0a0a0c] text-slate-200 p-4 md:p-8 font-sans selection:bg-cyan-500/30">
-            {/* BACKGROUND DECOR */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600 rounded-full blur-[120px]"></div>
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-600 rounded-full blur-[120px]"></div>
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto space-y-8">
-                {/* HEADER SECTION */}
                 <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/10 pb-8">
                     <div>
                         <h1 className="text-5xl font-black tracking-tighter text-white italic">
@@ -206,10 +191,7 @@ const APIStatusView: React.FC = () => {
                     </div>
                 </header>
 
-                {/* MAIN GRID */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    {/* LEFT COLUMN: API STATUS */}
                     <div className="lg:col-span-2 space-y-8">
                         <section>
                             <div className="flex items-center justify-between mb-6">
@@ -217,7 +199,6 @@ const APIStatusView: React.FC = () => {
                                     <span className="w-2 h-8 bg-cyan-500 rounded-full"></span>
                                     System Connectivity
                                 </h2>
-                                <span className="text-xs font-mono text-slate-500">REF: QF-STATUS-992</span>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {apiStatus.map(api => (
@@ -237,7 +218,6 @@ const APIStatusView: React.FC = () => {
                             </div>
                         </section>
 
-                        {/* TRAFFIC CHART */}
                         <Card title="Quantum Real-Time Traffic (Req/Sec)">
                             <div className="h-[350px] w-full mt-4">
                                 <ResponsiveContainer width="100%" height="100%">
@@ -256,23 +236,16 @@ const APIStatusView: React.FC = () => {
                                             itemStyle={{ color: '#fff', fontSize: '12px' }}
                                         />
                                         <Area type="monotone" dataKey="quantum" stroke="#06b6d4" strokeWidth={3} fillOpacity={1} fill="url(#colorQuantum)" />
-                                        <Area type="monotone" dataKey="stripe" stroke="#10b981" strokeWidth={2} fill="transparent" />
-                                        <Area type="monotone" dataKey="plaid" stroke="#6366f1" strokeWidth={2} fill="transparent" />
                                     </AreaChart>
                                 </ResponsiveContainer>
                             </div>
                         </Card>
                     </div>
 
-                    {/* RIGHT COLUMN: AUDIT & SECURITY */}
                     <div className="space-y-8">
                         <section className="bg-black/40 border border-white/10 rounded-3xl p-6 h-full flex flex-col shadow-2xl">
                             <div className="flex items-center justify-between mb-6">
                                 <h3 className="text-lg font-bold text-white uppercase tracking-widest">Audit Ledger</h3>
-                                <div className="flex gap-1">
-                                    <div className="w-2 h-2 rounded-full bg-red-500 animate-ping"></div>
-                                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                                </div>
                             </div>
                             <div className="flex-1 overflow-y-auto space-y-4 pr-2 custom-scrollbar max-h-[600px]">
                                 {auditLogs.map(log => (
@@ -287,31 +260,16 @@ const APIStatusView: React.FC = () => {
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 pt-6 border-t border-white/10">
-                                <div className="p-4 bg-cyan-500/10 rounded-xl border border-cyan-500/20">
-                                    <p className="text-[10px] text-cyan-300 font-bold uppercase mb-2">Vault Status</p>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-xs text-white">Homomorphic Encryption</span>
-                                        <span className="text-xs text-cyan-400 font-bold">ACTIVE</span>
-                                    </div>
-                                </div>
-                            </div>
                         </section>
                     </div>
                 </div>
             </div>
 
-            {/* AI CHAT OVERLAY */}
             {isChatOpen && (
-                <div className="fixed bottom-8 right-8 w-[400px] h-[600px] bg-[#0f172a] border border-white/20 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col z-50 overflow-hidden animate-in slide-in-from-bottom-10">
+                <div className="fixed bottom-8 right-8 w-[400px] h-[600px] bg-[#0f172a] border border-white/20 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col z-50 overflow-hidden">
                     <div className="p-6 bg-gradient-to-r from-cyan-600 to-blue-700 flex justify-between items-center">
-                        <div>
-                            <h3 className="text-white font-bold">Quantum AI Assistant</h3>
-                            <p className="text-cyan-100 text-[10px] uppercase tracking-widest">Secure Session Active</p>
-                        </div>
-                        <button onClick={() => setIsChatOpen(false)} className="text-white/50 hover:text-white">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
+                        <h3 className="text-white font-bold">Quantum AI Assistant</h3>
+                        <button onClick={() => setIsChatOpen(false)} className="text-white/50 hover:text-white">✕</button>
                     </div>
                     <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                         {chatMessages.map((msg, i) => (
@@ -321,13 +279,6 @@ const APIStatusView: React.FC = () => {
                                 </div>
                             </div>
                         ))}
-                        {isProcessing && (
-                            <div className="flex justify-start">
-                                <div className="bg-white/5 p-4 rounded-2xl animate-pulse text-cyan-400 text-xs font-bold">
-                                    QUANTUM PROCESSING...
-                                </div>
-                            </div>
-                        )}
                     </div>
                     <div className="p-4 bg-white/5 border-t border-white/10">
                         <div className="relative">
@@ -335,92 +286,32 @@ const APIStatusView: React.FC = () => {
                                 type="text" 
                                 value={chatInput}
                                 onChange={(e) => setChatInput(e.target.value)}
-                                onKeyPress={(e) => e.key === 'Enter' && handleAIChat()}
-                                placeholder="Ask Quantum AI..."
-                                className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-cyan-500 transition-all"
+                                onKeyDown={(e) => e.key === 'Enter' && handleAIChat()}
+                                className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white text-sm focus:outline-none focus:border-cyan-500"
                             />
-                            <button 
-                                onClick={handleAIChat}
-                                className="absolute right-2 top-2 p-1.5 bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition-all"
-                            >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showStripeModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl">
+                        <div className="p-8">
+                            <h2 className="text-2xl font-bold text-slate-900 mb-8">Quantum Pay</h2>
+                            <input type="text" value={stripeAmount} onChange={(e) => setStripeAmount(e.target.value)} className="w-full text-3xl font-bold text-slate-900 border-b-2 border-slate-100 mb-6" />
+                            <button onClick={handleStripePayment} disabled={paymentStatus !== 'idle'} className="w-full py-4 rounded-xl bg-slate-900 text-white font-bold">
+                                {paymentStatus === 'idle' ? `Pay $${stripeAmount}` : 'Processing...'}
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            {/* STRIPE MODAL SIMULATOR */}
-            {showStripeModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-md rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95">
-                        <div className="p-8">
-                            <div className="flex justify-between items-center mb-8">
-                                <h2 className="text-2xl font-bold text-slate-900">Quantum Pay</h2>
-                                <button onClick={() => setShowStripeModal(false)} className="text-slate-400 hover:text-slate-600">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                </button>
-                            </div>
-                            
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Amount (USD)</label>
-                                    <input 
-                                        type="text" 
-                                        value={stripeAmount}
-                                        onChange={(e) => setStripeAmount(e.target.value)}
-                                        className="w-full text-3xl font-bold text-slate-900 border-b-2 border-slate-100 focus:border-cyan-500 outline-none pb-2 transition-all"
-                                    />
-                                </div>
-
-                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                    <div className="flex items-center gap-4 mb-4">
-                                        <div className="w-12 h-8 bg-slate-800 rounded flex items-center justify-center text-[10px] text-white font-bold">VISA</div>
-                                        <div className="flex-1">
-                                            <p className="text-sm font-bold text-slate-900">•••• •••• •••• 4242</p>
-                                            <p className="text-xs text-slate-500">Exp: 12/26</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Secure Payment via Stripe Gateway</div>
-                                </div>
-
-                                <button 
-                                    onClick={handleStripePayment}
-                                    disabled={paymentStatus !== 'idle'}
-                                    className={`w-full py-4 rounded-xl font-bold text-white transition-all transform active:scale-95 ${
-                                        paymentStatus === 'success' ? 'bg-green-500' : 'bg-slate-900 hover:bg-black'
-                                    }`}
-                                >
-                                    {paymentStatus === 'idle' && `Pay $${stripeAmount}`}
-                                    {paymentStatus === 'processing' && 'Processing...'}
-                                    {paymentStatus === 'success' && 'Payment Complete!'}
-                                </button>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 p-4 text-center">
-                            <p className="text-[10px] text-slate-400 font-medium">
-                                Powered by <span className="font-bold">Stripe</span> | Secured by <span className="font-bold">Quantum Financial</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* CUSTOM SCROLLBAR STYLES */}
             <style dangerouslySetInnerHTML={{ __html: `
-                .custom-scrollbar::-webkit-scrollbar {
-                    width: 4px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-track {
-                    background: rgba(255, 255, 255, 0.05);
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb {
-                    background: rgba(6, 182, 212, 0.3);
-                    border-radius: 10px;
-                }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                    background: rgba(6, 182, 212, 0.5);
-                }
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.3); border-radius: 10px; }
             `}} />
         </div>
     );

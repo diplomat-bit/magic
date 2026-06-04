@@ -1,4 +1,4 @@
-```typescript
+
 import React from 'react';
 import {
   LineChart,
@@ -54,4 +54,3 @@ const BalanceReportChart: React.FC<BalanceReportChartProps> = ({ data }) => {
 };
 
 export default BalanceReportChart;
-```

@@ -1,3 +1,1 @@
-
-export const listIncomingPaymentDetails = async (params: any) => [];
-      
+export const listIncomingPaymentDetails = async (params: Record<string, unknown>) => [];

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(
   req: VercelRequest,
@@ -16,17 +16,18 @@ export default async function handler(
       return res.status(400).json({ error: "Invalid prompt" });
     }
 
-    // Initialize Gemini client
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({ error: "API configuration error" });
+    }
 
-    // Generate content
-    const result = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
-      contents: prompt,
-    });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
 
     return res.status(200).json({
-      text: result.text,
+      text: response.text(),
       sessionId,
     });
   } catch (err) {

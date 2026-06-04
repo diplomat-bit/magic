@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useContext, useState } from 'react';
 import { View, NavItem } from '../types';
 import { NAV_ITEMS } from '../constants';
@@ -106,4 +106,3 @@ const E_Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 };
 
 export default E_Sidebar;
-```

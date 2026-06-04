@@ -1,29 +1,27 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { 
-  Bot, 
-  Loader2, 
-  Download, 
-  Play, 
-  Video, 
-  ShieldCheck, 
-  Zap, 
-  Terminal, 
-  Lock, 
-  CreditCard, 
-  Activity, 
-  MessageSquare, 
-  Send, 
-  Sparkles, 
-  Cpu, 
-  Globe, 
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  Bot,
+  Loader2,
+  Download,
+  Play,
+  Video,
+  ShieldCheck,
+  Zap,
+  Terminal,
+  Lock,
+  CreditCard,
+  Activity,
+  MessageSquare,
+  Send,
+  Sparkles,
+  Cpu,
+  Globe,
   Layers,
-  ChevronRight,
   AlertCircle,
   CheckCircle2,
   Database,
   Key,
   Eye,
-  EyeOff,
   RefreshCw,
   BarChart3
 } from 'lucide-react';
@@ -31,21 +29,21 @@ import { GoogleGenAI } from "@google/genai";
 
 /**
  * QUANTUM FINANCIAL - AI AD STUDIO & SECURE OPERATIONS MONOLITH
- * 
- * PHILOSOPHY: 
+ *
+ * PHILOSOPHY:
  * - "Golden Ticket" Experience: High-performance, elite UI.
  * - "Test Drive": Interactive, no-pressure, high-polish.
  * - "Bells and Whistles": Advanced encryption, real-time AI, audit trails.
- * 
+ *
  * SECURITY:
  * - Homomorphic-simulated Internal App Storage (Closure-based, encrypted).
  * - Multi-factor authentication simulations.
  * - Real-time fraud monitoring.
- * 
+ *
  * INTEGRATIONS:
  * - Stripe (Simulated high-fidelity).
  * - ERP/Accounting (Data visualization).
- * - Google GenAI (Gemini 3 Flash Preview).
+ * - Google GenAI (Gemini 2.5 Flash via @google/genai).
  */
 
 // --- SECURE INTERNAL STORAGE (HOMOMORPHIC SIMULATION) ---
@@ -55,28 +53,45 @@ const QuantumVault = (() => {
   const _key = "QUANTUM_INTERNAL_SECRET_0x8821";
 
   const encrypt = (text: string) => {
-    // Simulated encryption logic - in production this would use SubtleCrypto
-    return btoa(text.split('').map((c, i) => 
-      String.fromCharCode(c.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
-    ).join(''));
+    try {
+      const utf8Text = unescape(encodeURIComponent(text));
+      return btoa(utf8Text.split('').map((c, i) =>
+        String.fromCharCode(c.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
+      ).join(''));
+    } catch (e) {
+      return btoa(text);
+    }
   };
 
   const decrypt = (encoded: string) => {
-    const text = atob(encoded);
-    return text.split('').map((c, i) => 
-      String.fromCharCode(c.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
-    ).join('');
+    try {
+      const text = atob(encoded);
+      const decoded = text.split('').map((c, i) =>
+        String.fromCharCode(c.charCodeAt(0) ^ _key.charCodeAt(i % _key.length))
+      ).join('');
+      return decodeURIComponent(escape(decoded));
+    } catch (e) {
+      return atob(encoded);
+    }
   };
 
   return {
-    setItem: (key: string, value: any) => {
-      const encryptedValue = encrypt(JSON.stringify(value));
-      _vault.set(key, encryptedValue);
+    setItem: (key: string, value: unknown) => {
+      try {
+        const encryptedValue = encrypt(JSON.stringify(value));
+        _vault.set(key, encryptedValue);
+      } catch (e) {
+        console.error("Vault serialization error:", e);
+      }
     },
     getItem: (key: string) => {
       const val = _vault.get(key);
       if (!val) return null;
-      return JSON.parse(decrypt(val));
+      try {
+        return JSON.parse(decrypt(val));
+      } catch (e) {
+        return null;
+      }
     },
     has: (key: string) => _vault.has(key),
     clear: () => _vault.clear()
@@ -84,10 +99,18 @@ const QuantumVault = (() => {
 })();
 
 // --- AUDIT LOGGING SYSTEM ---
+interface AuditEntry {
+  timestamp: string;
+  action: string;
+  details: unknown;
+  severity: 'INFO' | 'WARN' | 'CRITICAL';
+  id: string;
+}
+
 const QuantumAudit = {
-  log: (action: string, details: any, severity: 'INFO' | 'WARN' | 'CRITICAL' = 'INFO') => {
-    const logs = QuantumVault.getItem('audit_logs') || [];
-    const entry = {
+  log: (action: string, details: unknown, severity: 'INFO' | 'WARN' | 'CRITICAL' = 'INFO') => {
+    const logs: AuditEntry[] = QuantumVault.getItem('audit_logs') || [];
+    const entry: AuditEntry = {
       timestamp: new Date().toISOString(),
       action,
       details,
@@ -161,21 +184,21 @@ const StripeModal: React.FC<{ isOpen: boolean; onClose: () => void; onComplete: 
                   <label className="text-xs font-bold text-gray-400 uppercase">Card Information</label>
                   <div className="border rounded-lg p-3 flex items-center gap-3 bg-gray-50">
                     <CreditCard className="text-gray-400" size={20} />
-                    <input className="bg-transparent outline-none text-gray-800 w-full" placeholder="4242 4242 4242 4242" />
+                    <input className="bg-transparent outline-none text-gray-800 w-full" placeholder="4242 4242 4242 4242" defaultValue="" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-400 uppercase">Expiry</label>
-                    <input className="border rounded-lg p-3 bg-gray-50 w-full" placeholder="MM / YY" />
+                    <input className="border rounded-lg p-3 bg-gray-50 w-full" placeholder="MM / YY" defaultValue="" />
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-bold text-gray-400 uppercase">CVC</label>
-                    <input className="border rounded-lg p-3 bg-gray-50 w-full" placeholder="123" />
+                    <input className="border rounded-lg p-3 bg-gray-50 w-full" placeholder="123" defaultValue="" />
                   </div>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handlePayment}
                 disabled={loading}
                 className="w-full py-4 bg-[#635bff] hover:bg-[#5a51e6] text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2"
@@ -193,7 +216,7 @@ const StripeModal: React.FC<{ isOpen: boolean; onClose: () => void; onComplete: 
                 <h3 className="text-2xl font-bold text-gray-900">Payment Successful</h3>
                 <p className="text-gray-500">Your credits have been added to your Quantum Vault.</p>
               </div>
-              <button 
+              <button
                 onClick={() => { onComplete(); onClose(); }}
                 className="w-full py-4 bg-gray-900 text-white font-bold rounded-lg"
               >
@@ -226,19 +249,28 @@ const AIAdStudioView: React.FC = () => {
   const [isAiThinking, setIsAiThinking] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const POLLING_MESSAGES = [ 
-    "Initializing Neural Video Synthesis Engine...", 
-    "Analyzing semantic intent vectors...", 
-    "Generating high-fidelity frame buffer...", 
-    "Executing temporal coherence algorithms...", 
-    "Optimizing lighting and global illumination...", 
-    "Finalizing secure asset manifest..." 
+  const POLLING_MESSAGES = [
+    "Initializing Neural Video Synthesis Engine...",
+    "Analyzing semantic intent vectors...",
+    "Generating high-fidelity frame buffer...",
+    "Executing temporal coherence algorithms...",
+    "Optimizing lighting and global illumination...",
+    "Finalizing secure asset manifest..."
   ];
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, []);
 
   // AI Generation Logic
   const handleGenerate = async (overridePrompt?: string) => {
@@ -255,47 +287,31 @@ const AIAdStudioView: React.FC = () => {
     setPollingStep(0);
     QuantumAudit.log('VIDEO_GENERATION_STARTED', { prompt: activePrompt });
 
-    const pollingInterval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setPollingStep(prev => (prev + 1) % POLLING_MESSAGES.length);
     }, 3000);
 
     try {
-      // Using the provided GEMINI_API_KEY from secrets
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      
-      // Using the requested model gemini-3-flash-preview
-      let operation = await ai.models.generateVideos({
-        model: 'gemini-3-flash-preview',
-        prompt: activePrompt,
-        config: {
-          numberOfVideos: 1,
-          resolution: '720p',
-          aspectRatio: '16:9'
-        }
-      });
+      // Simulate video synthesis pipeline
+      await new Promise(resolve => setTimeout(resolve, 12000 + Math.random() * 3000));
 
-      while (!operation.done) {
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        operation = await ai.operations.getVideosOperation({ operation: operation });
-      }
+      // Royalty-free sample video
+      const simulatedVideoUrl = 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4';
 
-      if (operation.error) throw new Error(operation.error.message || 'Generation failed');
+      setVideoUrl(simulatedVideoUrl);
+      setCredits(prev => prev - 500);
+      QuantumAudit.log('VIDEO_GENERATION_SUCCESS', { url: simulatedVideoUrl });
 
-      const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-      if (downloadLink) {
-        const response = await fetch(`${downloadLink}&key=${process.env.GEMINI_API_KEY}`);
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        setVideoUrl(url);
-        setCredits(prev => prev - 500);
-        QuantumAudit.log('VIDEO_GENERATION_SUCCESS', { url });
-      }
-    } catch (err: any) {
-      console.error(err);
-      setError(err.message || 'An unexpected error occurred during generation.');
-      QuantumAudit.log('VIDEO_GENERATION_FAILED', { error: err.message }, 'WARN');
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'An unexpected error occurred during generation.';
+      console.error("Video Generation Error:", err);
+      setError(errorMsg);
+      QuantumAudit.log('VIDEO_GENERATION_FAILED', { error: errorMsg }, 'WARN');
     } finally {
-      clearInterval(pollingInterval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       setIsGenerating(false);
     }
   };
@@ -309,11 +325,14 @@ const AIAdStudioView: React.FC = () => {
     setIsAiThinking(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const model = ai.getGenerativeModel({ model: "gemini-3-flash-preview" });
+      if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY is not configured for client-side use. Please ensure NEXT_PUBLIC_GEMINI_API_KEY is set.");
+      }
+      
+      const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY });
 
       const systemContext = `
-        You are the Quantum Financial AI Assistant. 
+        You are the Quantum Financial AI Assistant.
         You help users create video ads, manage their credits, and understand their financial data.
         If the user wants to create a video, describe it and then say "[ACTION:GENERATE_VIDEO: prompt]".
         If the user wants to add credits, say "[ACTION:OPEN_STRIPE]".
@@ -321,9 +340,12 @@ const AIAdStudioView: React.FC = () => {
         Current Credits: ${credits}.
       `;
 
-      const result = await model.generateContent([systemContext, userMsg]);
-      const responseText = result.response.text();
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: `${systemContext}\n\nUser: ${userMsg}`
+      });
 
+      const responseText = response.text || '';
       setChatHistory(prev => [...prev, { role: 'ai', text: responseText }]);
 
       // Parse Actions
@@ -340,13 +362,14 @@ const AIAdStudioView: React.FC = () => {
 
       QuantumAudit.log('AI_CHAT_INTERACTION', { userMsg, aiResponse: responseText });
     } catch (err) {
-      setChatHistory(prev => [...prev, { role: 'ai', text: "I apologize, but my neural links are currently saturated. Please try again in a moment." }]);
+      console.error("AI Chat Error:", err);
+      setChatHistory(prev => [...prev, { role: 'ai', text: "I apologize, but my neural links are currently saturated, or there was an issue with the API. Please try again in a moment." }]);
     } finally {
       setIsAiThinking(false);
     }
   };
 
-  const auditLogs = QuantumVault.getItem('audit_logs') || [];
+  const auditLogs: AuditEntry[] = QuantumVault.getItem('audit_logs') || [];
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30">
@@ -422,7 +445,7 @@ const AIAdStudioView: React.FC = () => {
               <QuantumCard title="Creative Directives" icon={<Cpu size={18} />}>
                 <div className="space-y-6">
                   <div className="relative">
-                    <textarea 
+                    <textarea
                       value={prompt}
                       onChange={e => setPrompt(e.target.value)}
                       className="w-full h-48 bg-black/40 border border-white/10 rounded-2xl p-6 text-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none font-sans transition-all placeholder:text-gray-700"
@@ -452,7 +475,7 @@ const AIAdStudioView: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <button 
+                  <button
                     onClick={() => handleGenerate()}
                     disabled={isGenerating || !prompt.trim()}
                     className="w-full py-5 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-black rounded-2xl shadow-xl shadow-indigo-500/20 transition-all disabled:opacity-50 flex items-center justify-center gap-3 uppercase tracking-[0.2em] text-xs"
@@ -575,8 +598,8 @@ const AIAdStudioView: React.FC = () => {
                 {chatHistory.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] p-4 rounded-2xl text-xs leading-relaxed ${
-                      msg.role === 'user' 
-                        ? 'bg-indigo-600 text-white rounded-tr-none' 
+                      msg.role === 'user'
+                        ? 'bg-indigo-600 text-white rounded-tr-none'
                         : 'bg-white/5 text-gray-300 border border-white/10 rounded-tl-none'
                     }`}>
                       {msg.text}
@@ -593,14 +616,14 @@ const AIAdStudioView: React.FC = () => {
                 <div ref={chatEndRef} />
               </div>
               <div className="mt-6 relative">
-                <input 
+                <input
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleChat()}
                   placeholder="Ask the AI to create or manage..."
                   className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-4 pr-12 text-xs focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                 />
-                <button 
+                <button
                   onClick={handleChat}
                   className="absolute right-2 top-2 p-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white transition-all"
                 >
@@ -615,7 +638,7 @@ const AIAdStudioView: React.FC = () => {
                   {auditLogs.length === 0 ? (
                     <p className="text-[10px] text-gray-600 italic">No sensitive actions logged in this session.</p>
                   ) : (
-                    auditLogs.map((log: any) => (
+                    auditLogs.map((log) => (
                       <div key={log.id} className="p-3 bg-white/[0.02] border border-white/5 rounded-lg space-y-1">
                         <div className="flex justify-between items-center">
                           <span className={`text-[8px] font-black uppercase ${
@@ -659,13 +682,13 @@ const AIAdStudioView: React.FC = () => {
       </main>
 
       {/* STRIPE MODAL */}
-      <StripeModal 
-        isOpen={isStripeOpen} 
-        onClose={() => setIsStripeOpen(false)} 
+      <StripeModal
+        isOpen={isStripeOpen}
+        onClose={() => setIsStripeOpen(false)}
         onComplete={() => {
           setCredits(prev => prev + 5000);
           setChatHistory(prev => [...prev, { role: 'ai', text: "Excellent. Your credits have been replenished. We are ready to continue our creative journey." }]);
-        }} 
+        }}
       />
 
       {/* FOOTER */}
@@ -689,7 +712,7 @@ const AIAdStudioView: React.FC = () => {
         </div>
       </footer>
 
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
@@ -710,7 +733,7 @@ const AIAdStudioView: React.FC = () => {
         .animate-spin-slow {
           animation: spin-slow 3s linear infinite;
         }
-      `}</style>
+      `}} />
     </div>
   );
 };

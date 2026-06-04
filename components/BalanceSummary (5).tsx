@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { 
     Area, 
@@ -446,4 +446,3 @@ Financial Data:
 };
 
 export default BalanceSummary;
-```

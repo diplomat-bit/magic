@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, ReactNode, useCallback, useEffect, useContext } from 'react';
 import { User as BaseUser } from '../types';
 import { useAuth0 } from '@auth0/auth0-react';

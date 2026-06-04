@@ -1,4 +1,4 @@
-```typescript
+
 import React from 'react';
 
 // The James Burvel O'Callaghan III Code - Separator Component - Version 1.0.0

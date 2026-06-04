@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
   },
 });
 
-/* ---------- Mount ---------- */
+/* ---------- Mount Logic ---------- */
 const rootElement = document.getElementById('root');
 const loadingElement = document.getElementById('loading');
 
@@ -34,17 +34,20 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement);
 
+// The 'sync' function handles the handover from static HTML to React
+const hideLoader = () => {
+  if (loadingElement) loadingElement.style.display = 'none';
+  if (rootElement) rootElement.style.display = 'flex';
+};
+
 root.render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      {/* We pass the hideLoader logic into App, 
+        or simply call it here after the first render 
+      */}
+      <App onMount={hideLoader} />
       <SpeedInsights />
     </QueryClientProvider>
   </React.StrictMode>
 );
-
-/* ---------- Hide loader ---------- */
-window.addEventListener('load', () => {
-  if (loadingElement) loadingElement.style.display = 'none';
-  if (rootElement) rootElement.style.display = 'flex';
-});

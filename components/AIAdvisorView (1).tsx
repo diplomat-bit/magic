@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useContext, useReducer, useCallback, useMemo } from 'react';
 import { View, LedgerAccount } from '../types';
 import Card from './Card';
-import { GoogleGenAI, Chat, Content, Part, FunctionDeclaration, Tool, Type, FunctionCall } from "@google/genai";
+import { GoogleGenerativeAI, ChatSession as Chat, Content, Part, FunctionDeclaration, Tool, Type, FunctionCall } from "@google/generative-ai";
 import { DataContext } from '../context/DataContext';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell, Sector } from 'recharts';
-import { FaRobot, FaUser, FaTools, FaExclamationCircle, FaClipboard, FaClipboardCheck, FaRedo, FaChartLine, FaBriefcase, FaPaperPlane, FaBrain, FaSync, FaStopCircle, FaCogs, FaBullseye, FaChartPie, FaBolt, FaNewspaper } from 'react-icons/fa';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, LineChart, Line, CartesianGrid, PieChart, Pie, Cell } from 'recharts';
+import { FaRobot, FaUser, FaExclamationCircle, FaRedo, FaChartLine, FaPaperPlane, FaBrain, FaSync, FaCogs, FaBolt } from 'react-icons/fa';
 
 // --- ENTERPRISE GRADE TYPES ---
 
@@ -120,6 +120,8 @@ export const initialChatState: ChatState = {
     },
 };
 
+const formatCurrency = (amount: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+
 export const chatReducer = (state: ChatState, action: ChatAction): ChatState => {
     switch (action.type) {
         case 'START_MESSAGE_SEND':
@@ -156,7 +158,6 @@ export const chatReducer = (state: ChatState, action: ChatAction): ChatState => 
 
 export const useToolImplementations = (dispatch: React.Dispatch<ChatAction>) => {
     const context = useContext(DataContext);
-    const formatCurrency = (amount: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 
     return useMemo(() => ({
         getFinancialSummary: async () => {
@@ -251,12 +252,13 @@ export const useToolImplementations = (dispatch: React.Dispatch<ChatAction>) => 
         runHFTAlgorithm: async ({ strategy, durationSeconds }: { strategy: 'arbitrage' | 'market_making' | 'momentum'; durationSeconds: number }) => {
             const trades = [];
             const startTime = Date.now();
-            const endTime = startTime + durationSeconds * 1000;
+            const duration = Math.min(Math.max(parseInt(String(durationSeconds || 3), 10), 1), 10);
+            const endTime = startTime + duration * 1000;
             let pnl = 0;
             let tradeCount = 0;
             while (Date.now() < endTime) {
                 tradeCount++;
-                const tradePnl = (Math.random() - 0.49) * 100; // Simulate small win/loss
+                const tradePnl = (Math.random() - 0.49) * 100; 
                 pnl += tradePnl;
                 trades.push({
                     timestamp: new Date().toISOString(),
@@ -265,15 +267,15 @@ export const useToolImplementations = (dispatch: React.Dispatch<ChatAction>) => 
                     price: 100 + (Math.random() - 0.5) * 5,
                     pnl: tradePnl,
                 });
-                await new Promise(res => setTimeout(res, 50)); // Simulate high frequency
+                await new Promise(res => setTimeout(res, 50)); 
             }
             return {
                 strategy,
-                durationSeconds,
+                durationSeconds: duration,
                 totalTrades: tradeCount,
                 finalPnl: parseFloat(pnl.toFixed(2)),
-                winRate: parseFloat(((trades.filter(t => t.pnl > 0).length / trades.length) * 100).toFixed(2)),
-                tradeLog: trades.slice(-10), // Return last 10 trades for brevity
+                winRate: parseFloat(((trades.filter(t => t.pnl > 0).length / Math.max(1, trades.length)) * 100).toFixed(2)),
+                tradeLog: trades.slice(-10), 
             };
         },
         createFinancialGoal: async ({ name, targetAmount, deadline, priority }: { name: string; targetAmount: number; deadline: string; priority: 'high' | 'medium' | 'low' }) => {
@@ -283,10 +285,9 @@ export const useToolImplementations = (dispatch: React.Dispatch<ChatAction>) => 
                 targetAmount,
                 deadline,
                 priority,
-                currentAmount: 0, // Assume starts at 0
+                currentAmount: 0, 
             };
-            // In a real app, this would update a persistent state. Here we dispatch it.
-            dispatch({ type: 'SET_FINANCIAL_GOALS', payload: [newGoal] }); // Simplified: replaces goals
+            dispatch({ type: 'SET_FINANCIAL_GOALS', payload: [newGoal] }); 
             return { success: true, goal: newGoal };
         },
     }), [context, dispatch]);
@@ -303,7 +304,6 @@ const PortfolioDonutChart: React.FC<{ data: { name: string, value: number }[] }>
                     {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
                 <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                <Legend />
             </PieChart>
         </ResponsiveContainer>
     );
@@ -367,7 +367,7 @@ const RichContentRenderer: React.FC<{ content: RichContent }> = ({ content }) =>
     const renderContent = () => {
         switch (type) {
             case 'table':
-            case 'financial_summary':
+            case 'financial_summary': {
                 const tableData = type === 'financial_summary' ? Object.entries(data.summary) : data.rows;
                 const headers = type === 'financial_summary' ? ["Metric", "Value"] : data.headers;
                 return (
@@ -384,7 +384,8 @@ const RichContentRenderer: React.FC<{ content: RichContent }> = ({ content }) =>
                         </table>
                     </div>
                 );
-            case 'bar_chart':
+            }
+            case 'bar_chart': {
                 return (
                     <ResponsiveContainer width="100%" height={300}>
                         <BarChart data={data.chartData}>
@@ -397,7 +398,8 @@ const RichContentRenderer: React.FC<{ content: RichContent }> = ({ content }) =>
                         </BarChart>
                     </ResponsiveContainer>
                 );
-            case 'line_chart':
+            }
+            case 'line_chart': {
                 const keys = Object.keys(data.simulationData[0] || {}).filter(k => k !== 'year');
                 const colors = ['#38B2AC', '#805AD5', '#D53F8C'];
                 return (
@@ -412,6 +414,7 @@ const RichContentRenderer: React.FC<{ content: RichContent }> = ({ content }) =>
                         </LineChart>
                     </ResponsiveContainer>
                 );
+            }
             case 'portfolio_composition':
                 return <PortfolioDonutChart data={data.composition} />;
             case 'market_sentiment_analysis':
@@ -459,6 +462,13 @@ const MessageRenderer: React.FC<{ msg: EnhancedMessage }> = ({ msg }) => {
                             </div>
                         );
                     }
+                    if ('functionResponse' in part) {
+                        return (
+                            <div key={index} className="my-2 p-2 bg-gray-700/30 rounded-md text-xs font-mono text-gray-300">
+                                <div>Tool Response [<strong>{part.functionResponse.name}</strong>] received.</div>
+                            </div>
+                        );
+                    }
                     return null;
                 })}
             </div>
@@ -480,7 +490,7 @@ const ChatInputBar: React.FC<{ onSend: (text: string) => void; isLoading: boolea
 
     return (
         <div className="p-4 bg-gray-900 border-t border-gray-700">
-            <div className="flex gap-2 mb-2">
+            <div className="flex flex-wrap gap-2 mb-2">
                 {suggestions.map(s => (
                     <button key={s} onClick={() => setInput(s)} className="px-3 py-1 bg-gray-700 text-xs text-gray-300 rounded-full hover:bg-gray-600 transition-colors disabled:opacity-50" disabled={isLoading}>
                         {s}
@@ -492,7 +502,7 @@ const ChatInputBar: React.FC<{ onSend: (text: string) => void; isLoading: boolea
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                     placeholder="Ask Aetherius about your finances..."
                     className="flex-grow bg-gray-800 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
                     disabled={isLoading}
@@ -511,7 +521,7 @@ const SimulationInputForm: React.FC<{
     onSubmit: () => void;
 }> = ({ params, onUpdate, onSubmit }) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onUpdate({ [e.target.name]: e.target.value });
+        onUpdate({ [e.target.name]: parseFloat(e.target.value) || 0 });
     };
 
     return (
@@ -544,14 +554,14 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
     const toolImplementations = useToolImplementations(dispatch);
     const chatContainerRef = useRef<HTMLDivElement>(null);
     const [apiKey, setApiKey] = useState<string | null>(null);
-    const [genAI, setGenAI] = useState<GoogleGenAI | null>(null);
+    const [genAI, setGenAI] = useState<GoogleGenerativeAI | null>(null);
     const [chat, setChat] = useState<Chat | null>(null);
 
     useEffect(() => {
         const key = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
         if (key) {
             setApiKey(key);
-            const ai = new GoogleGenAI(key);
+            const ai = new GoogleGenerativeAI(key);
             setGenAI(ai);
         } else {
             dispatch({ type: 'SET_ERROR', payload: "API Key for Google Gemini is not configured." });
@@ -574,16 +584,26 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
                     ]
                 }]
             });
-            const newChat = model.startChat({
-                history: state.messages.map(msg => ({
-                    role: msg.role === 'system_tool' ? 'model' : msg.role,
-                    parts: msg.parts.map(p => {
-                        if ('functionResponse' in p) return { functionResponse: p.functionResponse };
-                        if ('functionCall' in p) return { functionCall: p.functionCall };
-                        return { text: (p as { text: string }).text };
-                    })
-                }))
-            });
+            const history = state.messages
+                .filter(msg => msg.parts.some(p => 'functionCall' in p || 'functionResponse' in p || 'text' in p))
+                .map(msg => {
+                    let role = msg.role;
+                    if (role === 'system_tool') {
+                        role = 'function' as any;
+                    }
+                    return {
+                        role: role,
+                        parts: msg.parts
+                            .map(p => {
+                                if ('functionResponse' in p) return { functionResponse: p.functionResponse };
+                                if ('functionCall' in p) return { functionCall: p.functionCall };
+                                if ('text' in p) return { text: p.text };
+                                return null;
+                            })
+                            .filter((p): p is any => p !== null)
+                    };
+                });
+            const newChat = model.startChat({ history });
             setChat(newChat);
         }
     }, [genAI, state.conversationId]);
@@ -635,6 +655,7 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
                 dispatch({ type: 'ADD_MODEL_RESPONSE', payload: modelMessageWithToolCalls });
 
                 const toolResults: ToolResultPart[] = [];
+                const richContentParts: RichContentPart[] = [];
                 for (const call of functionCalls) {
                     dispatch({ type: 'START_TOOL_EXECUTION', payload: call.name });
                     const tool = (toolImplementations as any)[call.name];
@@ -646,6 +667,23 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
                                 response: { content: JSON.stringify(output) },
                             },
                         });
+
+                        let richType: RichContentType | null = null;
+                        if (call.name === 'getFinancialSummary') richType = 'financial_summary';
+                        else if (call.name === 'getPortfolioComposition') richType = 'portfolio_composition';
+                        else if (call.name === 'simulateInvestmentGrowth') richType = 'line_chart';
+                        else if (call.name === 'analyzeMarketSentiment') richType = 'market_sentiment_analysis';
+                        else if (call.name === 'runHFTAlgorithm') richType = 'hft_simulation_dashboard';
+
+                        if (richType) {
+                            richContentParts.push({
+                                richContent: {
+                                    type: richType,
+                                    data: output,
+                                    title: call.name.replace(/([A-Z])/g, ' $1').trim()
+                                }
+                            });
+                        }
                     } else {
                         toolResults.push({
                             functionResponse: {
@@ -657,7 +695,17 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
                     dispatch({ type: 'END_TOOL_EXECUTION' });
                 }
 
-                result = await chat.sendMessage(toolResults.map(tr => ({ toolResponse: tr })));
+                if (toolResults.length > 0) {
+                    const toolResponseMessage: EnhancedMessage = {
+                        id: `msg_${Date.now()}_toolresp`,
+                        role: 'system_tool',
+                        parts: [...toolResults, ...richContentParts] as any,
+                        timestamp: new Date(),
+                    };
+                    dispatch({ type: 'ADD_MODEL_RESPONSE', payload: toolResponseMessage });
+                }
+
+                result = await chat.sendMessage(toolResults);
             }
         } catch (e: any) {
             console.error(e);
@@ -717,9 +765,9 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
                         {state.error && (
                             <div className="p-4 bg-red-900/50 border border-red-500 text-red-300 rounded-lg flex items-center gap-3">
                                 <FaExclamationCircle />
-                                <div>
-                                    <strong>Error:</strong> {state.error}
-                                    <button onClick={() => dispatch({ type: 'CLEAR_ERROR' })} className="ml-4 text-xs underline">Dismiss</button>
+                                <div className="flex-grow flex justify-between items-center">
+                                    <span><strong>Error:</strong> {state.error}</span>
+                                    <button onClick={() => dispatch({ type: 'CLEAR_ERROR' })} className="text-xs underline ml-4">Dismiss</button>
                                 </div>
                             </div>
                         )}
@@ -732,7 +780,6 @@ const AIAdvisorView: React.FC<{ previousView: View | null }> = ({ previousView }
                         onUpdate={(p) => dispatch({ type: 'UPDATE_SIMULATION_PARAMS', payload: p })}
                         onSubmit={handleSimulationSubmit}
                     />
-                    {/* Additional sidebar components can be added here */}
                 </aside>
             </div>
         </div>

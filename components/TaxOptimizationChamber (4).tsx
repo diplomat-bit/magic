@@ -1,4 +1,4 @@
-```tsx
+
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 
 // --- App-in-App: Sovereign AI Micro-Components ---
@@ -450,4 +450,3 @@ const TaxOptimizationChamber: React.FC = () => {
 };
 
 export default TaxOptimizationChamber;
-```

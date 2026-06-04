@@ -1,27 +1,19 @@
-
-import React, { useState, useContext, useEffect } from 'react';
-import { HashRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+import React, { useState, useContext } from 'react';
+import { Navigate } from 'react-router-dom';
 import { Cpu, AlertTriangle } from 'lucide-react';
 
 // Contexts
-import { AuthProvider, AuthContext } from '../context/AuthContext';
-import { DataProvider, DataContext } from '../context/DataContext';
-import { StripeDataProvider } from './StripeDataProvider';
-import { MoneyMovementProvider } from './MoneyMovementContext';
+import { AuthContext } from '../context/AuthContext';
+import { DataContext } from '../context/DataContext';
 
 // Layout
 import Sidebar from './Sidebar';
 import Header from './Header';
 import { View } from '../types';
-import { PlaidClient } from '../lib/plaidClient';
-
 
 // --- ALL VIEW COMPONENTS ---
 import AccountDetails from './AccountDetails';
 import AccountList from './AccountList';
-import AccountsDashboardView from './AccountsDashboardView';
 import AccountStatementGrid from './AccountStatementGrid';
 import AccountsView from './AccountsView';
 import { AccountVerificationModal } from './AccountVerificationModal';
@@ -41,35 +33,19 @@ import BalanceReportChart from './BalanceReportChart';
 import BalanceTransactionTable from './BalanceTransactionTable';
 import BudgetsView from './BudgetsView';
 import CardDesignVisualizer from './CardDesignVisualizer';
-import CardholderManagement from './CardholderManagement';
 import { ChargeDetailModal } from './ChargeDetailModal';
 import ChargeList from './ChargeList';
-import CitibankAccountProxyView from './CitibankAccountProxyView';
-import CitibankAccountsView from './CitibankAccountsView';
-import CitibankBillPayView from './CitibankBillPayView';
-import CitibankCrossBorderView from './CitibankCrossBorderView';
-import CitibankDeveloperToolsView from './CitibankDeveloperToolsView';
-import CitibankEligibilityView from './CitibankEligibilityView';
-import CitibankPayeeManagementView from './CitibankPayeeManagementView';
-import CitibankStandingInstructionsView from './CitibankStandingInstructionsView';
-import CitibankUnmaskedDataView from './CitibankUnmaskedDataView';
 import CommoditiesExchange from './CommoditiesExchange';
-import ComplianceAlertCard from './ComplianceAlertCard';
 import ComplianceOracleView from './ComplianceOracleView';
 import ConciergeService from './ConciergeService';
 import ConductorConfigurationView from './ConductorConfigurationView';
-import CorporateActionsNexusView from './CorporateActionsNexusView';
 import CorporateCommandView from './CorporateCommandView';
-import CounterpartyDashboardView from './CounterpartyDashboardView';
 import CounterpartyDetails from './CounterpartyDetails';
 import { CounterpartyForm } from './CounterpartyForm';
-import CounterpartyList from './CounterpartyList';
 import CreditHealthView from './CreditHealthView';
-import { CreditNoteLedger } from './CreditNoteLedger';
 import CryptoView from './CryptoView';
 import CustomerDashboard from './CustomerDashboard';
 import Dashboard from './Dashboard';
-import { DealFlow } from './DealFlow';
 import DerivativesDesk from './DerivativesDesk';
 import DeveloperHubView from './DeveloperHubView';
 import DisruptionIndexMeter from './DisruptionIndexMeter';
@@ -87,19 +63,12 @@ import FinancialDemocracyView from './FinancialDemocracyView';
 import FinancialGoalsView from './FinancialGoalsView';
 import FinancialReportingView from './FinancialReportingView';
 import ForexArena from './ForexArena';
-import GEIN_DashboardView from './GEIN_DashboardView';
-import GlobalMarketMap from './GlobalMarketMap';
 import GlobalPositionMap from './GlobalPositionMap';
 import GlobalSsiHubView from './GlobalSsiHubView';
-import IdentityView from './IdentityView';
-import ImpactTracker from './ImpactTracker';
 import IncomingPaymentDetailList from './IncomingPaymentDetailList';
-import { InvestmentForm } from './InvestmentForm';
-import InvestmentPortfolio from './InvestmentPortfolio';
 import InvestmentsView from './InvestmentsView';
 import InvoiceFinancingRequest from './InvoiceFinancingRequest';
 import LegacyBuilder from './LegacyBuilder';
-import { LoginView } from './LoginView';
 import MarketplaceView from './MarketplaceView';
 import MarqetaDashboardView from './MarqetaDashboardView';
 import ModernTreasuryView from './ModernTreasuryView';
@@ -107,24 +76,13 @@ import OpenBankingView from './OpenBankingView';
 import PaymentInitiationForm from './PaymentInitiationForm';
 import PaymentMethodDetails from './PaymentMethodDetails';
 import PaymentOrderForm from './PaymentOrderForm';
-import PayoutsDashboard from './PayoutsDashboard';
 import PersonalizationView from './PersonalizationView';
 import PhilanthropyHub from './PhilanthropyHub';
-import PlaidCRAMonitoringView from './PlaidCRAMonitoringView';
 import PlaidDashboardView from './PlaidDashboardView';
-import PlaidIdentityView from './PlaidIdentityView';
-import { PlaidInstitutionsExplorer } from './PlaidInstitutionsExplorer';
-import { PlaidItemManagementView } from './PlaidItemManagementView';
-import PlaidMainDashboard from './PlaidMainDashboard';
 import PnLChart from './PnLChart';
-import { PortfolioCompanyDetails } from './PortfolioCompanyDetails';
-import { PortfolioCompanyList } from './PortfolioCompanyList';
 import PrivateEquityLounge from './PrivateEquityLounge';
-import QuantumAssets from './QuantumAssets';
 import QuantumWeaverView from './QuantumWeaverView';
 import RealEstateEmpire from './RealEstateEmpire';
-import RecentTransactions from './RecentTransactions';
-import ReconciliationHubView from './ReconciliationHubView';
 import RefundForm from './RefundForm';
 import RemittanceInfoEditor from './RemittanceInfoEditor';
 import ReportingView from './ReportingView';
@@ -137,13 +95,10 @@ import SecurityView from './SecurityView';
 import SendMoneyView from './SendMoneyView';
 import SettingsView from './SettingsView';
 import SovereignWealth from './SovereignWealth';
-import SpendingAnalysisChart from './SpendingAnalysisChart';
 import SsiEditorForm from './SsiEditorForm';
 import SSOView from './SSOView';
-import StrategyEditor from './StrategyEditor';
 import StripeDashboardView from './StripeDashboardView';
 import StripeNexusDashboard from './StripeNexusDashboard';
-import StripeNexusView from './StripeNexusView';
 import StripeStatusBadge from './StripeStatusBadge';
 import StructuredPurposeInput from './StructuredPurposeInput';
 import SubscriptionList from './SubscriptionList';
@@ -161,41 +116,108 @@ import VentureCapitalDesk from './VentureCapitalDesk';
 import VentureCapitalDeskView from './VentureCapitalDeskView';
 import VerificationReportsView from './VerificationReportsView';
 import VirtualAccountForm from './VirtualAccountForm';
-import VirtualAccountsDashboard from './VirtualAccountsDashboard';
 import VirtualAccountsTable from './VirtualAccountsTable';
 import VoiceControl from './VoiceControl';
-import WealthTimeline from './WealthTimeline';
 import WebhookSimulator from './WebhookSimulator';
-import LandingPage from './LandingPage';
 import TheBookView from './TheBookView';
 import KnowledgeBaseView from './KnowledgeBaseView';
 
-// --- Error Boundary ---
-interface ErrorBoundaryProps { children?: React.ReactNode; }
-interface ErrorBoundaryState { hasError: boolean; }
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  public props: ErrorBoundaryProps;
-  state: ErrorBoundaryState = { hasError: false };
-  constructor(props: ErrorBoundaryProps) { super(props); this.props = props; }
-  static getDerivedStateFromError(error: Error) { console.error("ErrorBoundary caught:", error); return { hasError: true }; }
-  render() { return this.state.hasError ? <h1>Something went wrong.</h1> : this.props.children; }
+type ComponentType = React.ComponentType<any> | undefined | null;
+
+class ViewErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("View rendering error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-gray-400">
+          <AlertTriangle className="w-12 h-12 mb-4 text-red-500" />
+          <h2 className="text-xl font-bold text-white mb-2">View Error</h2>
+          <p>An error occurred while rendering this view.</p>
+          <button 
+            onClick={() => this.setState({ hasError: false })}
+            className="mt-4 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
-// --- Layout ---
-const SAppLayout = () => {
+const Wrapper = (Component: ComponentType, props?: Record<string, any>) => {
+  if (!Component) {
+    return (
+      <div className="flex items-center justify-center p-8 text-red-400 bg-red-950/20 rounded-lg border border-red-500/30">
+        <AlertTriangle className="w-6 h-6 mr-3" />
+        <span>Component unavailable</span>
+      </div>
+    );
+  }
+  const safeProps = props ?? {};
+  return <Component {...safeProps} />;
+};
+
+const ModalWrapperComponent = ({ Component, componentProps }: { Component: React.ComponentType<any>, componentProps: Record<string, any> }) => {
+    const [isOpen, setIsOpen] = useState(true);
+    return <Component isOpen={isOpen} onClose={() => setIsOpen(false)} {...componentProps} />;
+};
+
+const ModalWrapper = (Component: ComponentType, props?: Record<string, any>) => {
+    if (!Component) {
+        return (
+            <div className="flex items-center justify-center p-8 text-red-400 bg-red-950/20 rounded-lg border border-red-500/30">
+                <AlertTriangle className="w-6 h-6 mr-3" />
+                <span>Modal component unavailable</span>
+            </div>
+        );
+    }
+    return <ModalWrapperComponent Component={Component} componentProps={props ?? {}} />;
+};
+
+const DataContextWrapperComponent = ({ Component, componentProps }: { Component: React.ComponentType<any>, componentProps: Record<string, any> }) => {
+    const dataContext = useContext(DataContext);
+    const mockContext = { 
+        setActiveView: () => {}, 
+        impactData: { treesPlanted: 0, progressToNextTree: 0 },
+    };
+    const props = { ...(dataContext || mockContext), ...componentProps };
+    return <Component {...props} />;
+};
+
+const DataContextWrapper = (Component: ComponentType, extraProps?: Record<string, any>) => {
+    if (!Component) return null;
+    return <DataContextWrapperComponent Component={Component} componentProps={extraProps ?? {}} />;
+};
+
+const SApp = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const dataContext = useContext(DataContext);
-  const { isAuthenticated } = useContext(AuthContext)!;
+  const authContext = useContext(AuthContext);
 
   if (!dataContext) {
     return <div>Error: DataContext not found.</div>;
   }
 
   const { isLoading, error, activeView, setActiveView } = dataContext;
+  const isAuthenticated = authContext?.isAuthenticated;
 
   if (isLoading) {
     return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-950 text-white gap-4">
+        <div className="h-full w-full flex flex-col items-center justify-center bg-gray-950 text-white gap-4">
             <Cpu className="w-16 h-16 text-cyan-400 animate-pulse" />
             <h1 className="text-2xl font-bold tracking-wider">INITIALIZING SOVEREIGN AI NEXUS...</h1>
             <p className="text-gray-400 font-mono">Generating financial universe from quantum foam...</p>
@@ -217,7 +239,7 @@ const SAppLayout = () => {
 
   if (error) {
       return (
-        <div className="h-screen w-screen flex flex-col items-center justify-center bg-red-950 text-red-300 gap-4 p-8">
+        <div className="h-full w-full flex flex-col items-center justify-center bg-red-950 text-red-300 gap-4 p-8">
             <AlertTriangle className="w-16 h-16 text-red-500" />
             <h1 className="text-3xl font-bold">SYSTEM INITIALIZATION FAILURE</h1>
             <p className="text-red-400 max-w-md text-center bg-red-500/10 p-4 rounded-lg border border-red-500/30">
@@ -233,7 +255,7 @@ const SAppLayout = () => {
       return <Navigate to="/login" replace />;
   }
 
-  const renderView = () => {
+  const renderViewContent = () => {
     switch (activeView) {
         case View.Dashboard: return <Dashboard />;
         case View.Transactions: return <TransactionsView />;
@@ -346,12 +368,31 @@ const SAppLayout = () => {
         case View.VoiceControl: return DataContextWrapper(VoiceControl as any);
         case View.WebhookSimulator: return Wrapper(WebhookSimulator, { stripeAccountId: 'acct_mock' });
 
-        default: return <Dashboard />;
+        default: 
+            return (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <AlertTriangle className="w-12 h-12 mb-4 text-yellow-500" />
+                    <h2 className="text-xl font-bold text-white mb-2">View Not Found</h2>
+                    <p>The requested view could not be found or is currently unavailable.</p>
+                    <button 
+                        onClick={() => setActiveView(View.Dashboard)}
+                        className="mt-4 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded transition-colors"
+                    >
+                        Return to Dashboard
+                    </button>
+                </div>
+            );
     }
   };
 
+  const renderView = () => (
+    <ViewErrorBoundary>
+      {renderViewContent()}
+    </ViewErrorBoundary>
+  );
+
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden font-sans">
+    <div className="flex h-full bg-gray-900 text-white overflow-hidden font-sans">
       <Sidebar 
         isOpen={isSidebarOpen} 
         setIsOpen={setIsSidebarOpen} 
@@ -364,80 +405,9 @@ const SAppLayout = () => {
         </main>
       </div>
       
-      {/* FIX: Render VoiceControl correctly as a component */}
       <VoiceControl setActiveView={setActiveView} />
     </div>
   );
 };
 
-// --- Wrapper Components for Props ---
-const Wrapper = (Component: React.FC<any>, props: any = {}) => {
-  const WrappedComponent = () => <Component {...props} />;
-  return <WrappedComponent />;
-};
-const ModalWrapper = (Component: React.FC<any>, props: any = {}) => {
-    const [isOpen, setIsOpen] = useState(true);
-    const WrappedComponent = () => <Component isOpen={isOpen} onClose={() => setIsOpen(false)} {...props} />;
-    return <WrappedComponent />;
-};
-const DataContextWrapper = (Component: React.FC<any>, extraProps: any = {}) => {
-    const dataContext = useContext(DataContext);
-    const mockContext = { 
-        setActiveView: () => {}, 
-        impactData: { treesPlanted: 0, progressToNextTree: 0 },
-    };
-    const props = { ...(dataContext || mockContext), ...extraProps };
-    const WrappedComponent = () => <Component {...props} />;
-    return <WrappedComponent />;
-};
-
-const theme = createTheme({ palette: { mode: 'dark' } });
-
-// --- Protected Route Helper ---
-const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
-    const authContext = useContext(AuthContext);
-    const isAuthenticated = authContext?.isAuthenticated;
-    const isLoading = authContext?.isLoading;
-    
-    if (!isLoading && !isAuthenticated) {
-        return <Navigate to="/login" replace />;
-    }
-    return <>{children}</>;
-};
-
-// --- Main App Component ---
-function sApp() {
-  return (
-    <ErrorBoundary>
-      <AuthProvider>
-        <DataProvider>
-          <MoneyMovementProvider>
-            <StripeDataProvider>
-              <ThemeProvider theme={theme}>
-                <CssBaseline />
-                <Router>
-                  <Routes>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/login" element={<LoginView />} />
-                    <Route path="/sso" element={<SSOView />} />
-                    
-                    {/* Protected Routes Wrapper */}
-                    <Route element={
-                        <ProtectedRoute>
-                            <SAppLayout />
-                        </ProtectedRoute>
-                    }>
-                      <Route path="*" element={<Dashboard />} />
-                    </Route>
-                  </Routes>
-                </Router>
-              </ThemeProvider>
-            </StripeDataProvider>
-          </MoneyMovementProvider>
-        </DataProvider>
-      </AuthProvider>
-    </ErrorBoundary>
-  );
-}
-
-export default sApp;
+export default SApp;

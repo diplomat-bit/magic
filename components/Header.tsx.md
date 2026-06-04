@@ -23,9 +23,9 @@ The left side handles secure navigation and branding.
 
 The center is replaced by the `ServiceHealthIndicator`. This component actively queries the unified API gateway health endpoint (mocked here for structural completeness) to provide real-time assurance of system availability.
 
-```tsx
+
 const ServiceHealthIndicator: React.FC = () => { ... };
-```
+
 
 **Functionality:**
 *   **Real-time Service Aggregation**: Checks the health status of critical domains (e.g., Authentication Service, Core Ledger API, Treasury Orchestrator).

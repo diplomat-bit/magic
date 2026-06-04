@@ -1,4 +1,4 @@
-```tsx
+
 import React from 'react';
 
 // A robust class name utility function to conditionally join class names.
@@ -138,4 +138,3 @@ const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
 Separator.displayName = "Separator";
 
 export { Separator };
-```

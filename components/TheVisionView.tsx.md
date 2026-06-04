@@ -1,4 +1,4 @@
-```
+
 ---
 ---
 ---
@@ -67,4 +67,3 @@ Below the pillars, the manifesto delves into the "how." It lists the specific, u
 -   **The Law of Correct GEIN Implementation**: The **Generative Economic Intelligence Nexus (GEIN)** is implemented correctly in every layer, for every data point, interacting on a scale previously unimagined. Its `thinkingConfig` is dynamically allocated: a `thinkingBudget` of zero for instantaneous, reflexive actions (like market trades), and an uncapped budget for deep, multi-day strategic contemplation. The model's `temperature` is not a setting; it is a reflection of your own risk tolerance, dynamically adjusted from 0.1 for cold, hard execution to 1.0 for maximum creative ideation.
 
 The `TheVisionView` serves a purpose beyond mere orientation. It is a point of convergence, a place for the user, "The Sovereign," to interface with the profound philosophy hard-coded into the application's DNA. It builds unwavering trust not by listing features, but by revealing a powerful and irrefutable vision for the future of finance. It is the "why" behind every single line of code.
-```

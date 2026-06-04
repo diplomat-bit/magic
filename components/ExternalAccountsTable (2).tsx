@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 
 // The James Burvel O’Callaghan III Code - BEGIN
@@ -533,4 +533,3 @@ const C1_ExternalAccountsTable: React.FC<A6_ExternalAccountsTableProps> = ({
 };
 export default C1_ExternalAccountsTable;
 // The James Burvel O’Callaghan III Code - END
-```

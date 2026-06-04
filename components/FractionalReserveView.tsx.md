@@ -1,5 +1,5 @@
 
-```typescript
+
 namespace TheAssemblyLayerPrinciple {
     type MonetaryUnit = number;
     
@@ -48,4 +48,4 @@ namespace TheAssemblyLayerPrinciple {
         const exposition = theAI.explainThePrinciple();
     }
 }
-```
+

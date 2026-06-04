@@ -1,7 +1,5 @@
-
 import React from 'react';
 import Card from './Card';
-import { Brain } from 'lucide-react';
 
 // --- Icon Components (Self-contained SVGs for demonstration) ---
 

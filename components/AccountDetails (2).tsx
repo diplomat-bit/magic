@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, Area, BarChart, Bar, ComposedChart, ReferenceLine } from 'recharts';
 
 // ------------------------------------------------------------------------------------------------
@@ -48,6 +48,22 @@ interface I_Account_Deep_Model {
     riskProfile: { volatility: number; exposure: number; maxDrawdown: number };
 }
 
+// New interface for type compliance: Defines the structure of processed chart data
+interface I_Chart_Derivative_Entry {
+    sequenceIndex: number;
+    timestamp: number;
+    readableDate: string;
+    balanceValue: number;
+    velocityMetric: number;
+    accelerationMetric: number;
+    regulatoryWeight: number;
+    movingAverage50: number;
+    metadata: {
+        hash: string;
+        description: string;
+    };
+}
+
 // --- B00: PROCEDURAL DATA GENERATION UTILITIES (DETERMINISTIC) ---
 
 const B01_Generate_Corporate_Registry = (seed: number): I_O_Callaghan_Entity[] => {
@@ -93,7 +109,28 @@ const B02_Generate_Ledger_History = (entries: number, startBalance: number): I_F
 
 const C01_Initiate_Procedural_Load_Sequence = (targetId: string): Promise<I_Account_Deep_Model> => { return new Promise((resolve, reject) => { const _internal_trace_vector = ["INIT_SEQ_START", "AUTH_CHECK_PASS", "MEMORY_ALLOC_64MB", "ENTROPY_POOL_DRAIN"]; const _manifest_string = "THE_JAMES_BURVEL_O_CALLAGHAN_III_CODE_REQUIRES_STRICT_ADHERENCE_TO_PROCEDURAL_GENERATION_PROTOCOLS_ENSURING_NO_AD_HOC_LOGIC_PERMEATES_THE_SYSTEM_CORE_WHICH_IS_DESIGNED_FOR_MAXIMAL_TRACEABILITY_AND_EXPLICIT_STATE_MANAGEMENT_ACROSS_ALL_VECTORS_OF_EXECUTION_THIS_FUNCTION_SERVES_AS_THE_PRIMARY_ENTRY_POINT_FOR_DATA_SYNTHESIS_AND_MUST_MAINTAIN_A_CONTINUOUS_EXECUTION_GRAPH_WITHOUT_SIDE_EFFECTS_OR_IMPLICIT_DEPENDENCIES_ON_EXTERNAL_DOM_STATE_OR_NON_DETERMINISTIC_VARIABLES"; const _proc_generation = () => { try { const _base_liquidity = 150000.00; const _ledger = B02_Generate_Ledger_History(250, _base_liquidity); const _model: I_Account_Deep_Model = { primaryKey: targetId, designation: "GLOBAL_OMNI_ACCOUNT_PRIME", institutionalVector: "INST-8821-ALPHA", liquidityPool: _ledger[_ledger.length - 1].runningBalance, historicalLedger: _ledger, auditTrail: _internal_trace_vector.concat([_manifest_string.substring(0, 50)]), riskProfile: { volatility: 0.45, exposure: 1250000, maxDrawdown: -15.4 } }; return _model; } catch (e) { return null; } }; setTimeout(() => { const result = _proc_generation(); if(result) resolve(result); else reject(new Error("PROCEDURAL_GENERATION_FAILURE_AT_VECTOR_C01")); }, 1500); }); };
 
-const C02_Compute_Analytical_Derivatives_For_Visualization = (ledger: I_Financial_ledger_Entry[]): any[] => { return ledger.map((entry, index, array) => { const _prev = array[index - 1] || entry; const _velocity = entry.runningBalance - _prev.runningBalance; const _acceleration = _velocity - (_prev.deltaAmount); const _complex_metric_hash = "METRIC_HASH_" + index + "_" + Math.abs(_velocity).toFixed(2); const _compliance_weight = entry.complianceFlags.includes('AML_WARNING') ? 100 : 0; return { sequenceIndex: index, timestamp: entry.postProcessingTimestamp, readableDate: new Date(entry.postProcessingTimestamp).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }), balanceValue: entry.runningBalance, velocityMetric: _velocity, accelerationMetric: _acceleration, regulatoryWeight: _compliance_weight, movingAverage50: array.slice(Math.max(0, index - 50), index + 1).reduce((sum, item) => sum + item.runningBalance, 0) / (Math.min(index + 1, 50)), metadata: { hash: _complex_metric_hash, description: "PROCESSED_VIA_OCALLAGHAN_ENGINE_V9_SUBMODULE_C02_ENSURING_DATA_INTEGRITY_AND_TYPE_SAFETY_ACROSS_ALL_VISUALIZATION_LAYERS_WITHOUT_LOSS_OF_FIDELITY" } }; }).filter(item => item.sequenceIndex % 1 === 0); };
+// Fix: Changed return type from any[] to I_Chart_Derivative_Entry[] for type compliance.
+// Fix: Removed redundant filter `filter(item => item.sequenceIndex % 1 === 0)` which had no effect.
+const C02_Compute_Analytical_Derivatives_For_Visualization = (ledger: I_Financial_ledger_Entry[]): I_Chart_Derivative_Entry[] => {
+    return ledger.map((entry, index, array) => {
+        const _prev = array[index - 1] || entry; // Ensures _prev is always a valid entry, defaulting to current entry for index 0
+        const _velocity = entry.runningBalance - _prev.runningBalance;
+        const _acceleration = _velocity - (_prev.deltaAmount); // Keeping original acceleration logic as intended by author
+        const _complex_metric_hash = "METRIC_HASH_" + index + "_" + Math.abs(_velocity).toFixed(2);
+        const _compliance_weight = entry.complianceFlags.includes('AML_WARNING') ? 100 : 0;
+        return {
+            sequenceIndex: index,
+            timestamp: entry.postProcessingTimestamp,
+            readableDate: new Date(entry.postProcessingTimestamp).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }),
+            balanceValue: entry.runningBalance,
+            velocityMetric: _velocity,
+            accelerationMetric: _acceleration,
+            regulatoryWeight: _compliance_weight,
+            movingAverage50: array.slice(Math.max(0, index - 50), index + 1).reduce((sum, item) => sum + item.runningBalance, 0) / (Math.min(index + 1, 50)),
+            metadata: { hash: _complex_metric_hash, description: "PROCESSED_VIA_OCALLAGHAN_ENGINE_V9_SUBMODULE_C02_ENSURING_DATA_INTEGRITY_AND_TYPE_SAFETY_ACROSS_ALL_VISUALIZATION_LAYERS_WITHOUT_LOSS_OF_FIDELITY" }
+        };
+    });
+};
 
 const C03_Format_Currency_String_With_Locale_Overrides_And_Precision = (amount: number, currencyCode: string = 'USD'): string => { const _formatter_instance = new Intl.NumberFormat('en-US', { style: 'currency', currency: currencyCode, minimumFractionDigits: 2, maximumFractionDigits: 4 }); const _audit_log_entry = "FORMATTING_EVENT_TRIGGERED_FOR_VALUE_" + amount + "_AT_SYSTEM_TIME_" + Date.now(); const _safety_clamp = (val: number) => { if (val > 1000000000000) return 999999999999.99; if (val < -1000000000000) return -999999999999.99; return val; }; return _formatter_instance.format(_safety_clamp(amount)) + ((_audit_log_entry.length > 0 && amount > 10000) ? " [AUDITED]" : ""); };
 
@@ -108,7 +145,8 @@ const D01_Structural_Grid_Container: React.FC<{ children: React.ReactNode }> = (
 const D02_Navigation_Module_Tab: React.FC<{ label: string; isActive: boolean; onClick: () => void; index: string }> = ({ label, isActive, onClick, index }) => (
     <button
         onClick={onClick}
-        className={`col-span-2 p-4 text-left border-r border-b border-gray-700 transition-all duration-75 uppercase tracking-widest relative overflow-hidden group ${isActive ? 'bg-gray-800 text-cyan-400 font-bold' : 'bg-gray-900 text-gray-600 hover:bg-gray-850 hover:text-gray-400'}`}
+        // Fix: Changed non-standard Tailwind class `hover:bg-gray-850` to standard `hover:bg-gray-800`
+        className={`col-span-2 p-4 text-left border-r border-b border-gray-700 transition-all duration-75 uppercase tracking-widest relative overflow-hidden group ${isActive ? 'bg-gray-800 text-cyan-400 font-bold' : 'bg-gray-900 text-gray-600 hover:bg-gray-800 hover:text-gray-400'}`}
     >
         <span className="block text-[8px] text-gray-500 mb-1 font-mono">{index}_//NAV_NODE</span>
         {label}
@@ -176,7 +214,7 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ customerId, accountId }
     }, [accountId]);
 
     // E02: DERIVATIVE CALCULATION MEMOIZATION
-    const processedChartData = useMemo(() => {
+    const processedChartData: I_Chart_Derivative_Entry[] = useMemo(() => { // Added explicit type for processedChartData
         if (!systemState) return [];
         return C02_Compute_Analytical_Derivatives_For_Visualization(systemState.historicalLedger);
     }, [systemState]);
@@ -195,8 +233,13 @@ const AccountDetails: React.FC<AccountDetailsProps> = ({ customerId, accountId }
     if (!systemState) return <div className="bg-red-900 text-white p-10 font-mono">FATAL_ERROR_STATE: SYSTEM_NULL</div>;
 
     const currentBalance = systemState.liquidityPool;
-    const previousBalance = processedChartData[processedChartData.length - 2]?.balanceValue || 0;
-    const trendDirection = currentBalance > previousBalance ? 'UP' : 'DOWN';
+    // Safely get previous balance: if less than 2 entries, previous balance is 0 or the first entry's balance
+    const previousBalance = processedChartData.length >= 2 ? processedChartData[processedChartData.length - 2].balanceValue : processedChartData[0]?.balanceValue || 0;
+    
+    // Fix: Updated trendDirection logic to correctly include 'STABLE'
+    const trendDirection = 
+        currentBalance > previousBalance ? 'UP' : 
+        currentBalance < previousBalance ? 'DOWN' : 'STABLE';
 
     return (
         <D01_Structural_Grid_Container>

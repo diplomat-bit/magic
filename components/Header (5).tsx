@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useContext, useEffect, useCallback } from 'react';
 import { DataContext } from '../context/DataContext';
 import { View, Notification } from '../types';
@@ -296,4 +296,3 @@ const Header: React.FC<HeaderProps> = ({ setActiveView, onMenuClick }) => {
 };
 
 export default Header;
-```

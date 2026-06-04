@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { GoogleGenAI } from '@google/genai';
 import Card from './Card';
@@ -528,4 +528,3 @@ const DeveloperPortal: React.FC = () => {
 };
 
 export default FinancialDemocracyView;
-```

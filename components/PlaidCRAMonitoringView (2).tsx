@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   CraMonitoringInsightsGetResponse,
@@ -565,4 +565,3 @@ const PlaidCRAMonitoringView: React.FC = () => {
 };
 
 export default PlaidCRAMonitoringView;
-```

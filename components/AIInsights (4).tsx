@@ -2,7 +2,7 @@ import React, { useContext, useState, useMemo } from 'react';
 import Card from './Card';
 import type { AIInsight } from '../types';
 import { DataContext } from '../context/DataContext';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LineChart, Line, CartesianGrid } from 'recharts';
+import { XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid } from 'recharts';
 
 // --- GEIN-Enhanced Component Ecosystem for Hyper-Scale AI-Driven Trading ---
 
@@ -121,6 +121,7 @@ const ActionModal: React.FC<{ insight: EnhancedAIInsight; onClose: () => void }>
                         <p className="text-sm text-gray-400 mb-4">Adjust allocation from {insight.details?.currentAllocation}% to {insight.details?.suggestedAllocation}%. This is a high-conviction trade based on predictive market analytics.</p>
                         <div className="space-y-2">
                             <label htmlFor="allocation" className="block text-sm font-medium text-gray-300">New Allocation (%)</label>
+                            {/* Input range is currently for display/visual reference. No onChange handler implemented to capture user input for execution. */}
                             <input type="range" id="allocation" min="0" max="100" defaultValue={insight.details?.suggestedAllocation} className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-cyan-500" />
                         </div>
                     </>
@@ -131,7 +132,8 @@ const ActionModal: React.FC<{ insight: EnhancedAIInsight; onClose: () => void }>
                         <h4 className="text-lg font-semibold text-gray-100 mb-2">Set Stop-Loss: {insight.details?.asset}</h4>
                         <p className="text-sm text-gray-400 mb-4">Current Price: ${insight.details?.currentPrice?.toFixed(2)}. The AI suggests a new stop-loss to mitigate downside risk from volatility spikes.</p>
                         <div className="p-3 bg-red-900/20 border border-red-500/50 rounded text-red-300 text-center text-lg font-bold">
-                            Suggested Stop: ${insight.details?.suggestedStopLoss}
+                            {/* Ensured suggestedStopLoss is also formatted for consistency */}
+                            Suggested Stop: ${insight.details?.suggestedStopLoss?.toFixed(2)}
                         </div>
                     </>
                 );
@@ -248,12 +250,16 @@ const ActionModal: React.FC<{ insight: EnhancedAIInsight; onClose: () => void }>
 };
 
 export const AIInsights: React.FC = () => {
-    const context = useContext(DataContext);
+    // The DataContext is imported but `context.financialGoals` is not directly used to generate insights.
+    // The insights are currently hardcoded for demonstration purposes.
+    // const context = useContext(DataContext); // Removed unused context variable as it was not functionally contributing to the insights generation.
     const [selectedInsight, setSelectedInsight] = useState<EnhancedAIInsight | null>(null);
 
-    // Mock data generation if context data is limited
+    // Mock data generation for AI insights.
     const insights: EnhancedAIInsight[] = useMemo(() => {
-        const baseInsights = context?.financialGoals || []; // Using financialGoals as a seed for mock insights
+        // Removed `const baseInsights = context?.financialGoals || [];` as it was not used to construct the insights array.
+        // The insights are hardcoded below. If dynamic insights from DataContext are needed,
+        // this section would require more sophisticated integration.
         
         return [
             {
@@ -271,7 +277,7 @@ export const AIInsights: React.FC = () => {
                 sourceModel: 'Sentinel-Prime-v4',
                 timeToLive: 3600,
                 riskAnalysis: { volatilityIndex: 65, sharpeRatio: 1.8, maxDrawdown: 12 },
-                backtestData: Array.from({length: 30}, (_, i) => ({ name: `Day ${i}`, value: 100 + Math.random() * 20 + i })),
+                backtestData: Array.from({length: 30}, (_, i) => ({ name: `Day ${i + 1}`, value: 100 + Math.random() * 20 + i })),
                 alternativeActions: [
                     { actionType: 'hedge_with_options', rationale: 'Buy protective puts to lock in gains without selling.', confidence: 75 },
                     { actionType: 'do_nothing', rationale: 'Allow drift if momentum indicators remain strong.', confidence: 40 }
@@ -294,7 +300,7 @@ export const AIInsights: React.FC = () => {
                 sourceModel: 'Risk-Overseer-v9',
                 timeToLive: 7200,
                 riskAnalysis: { volatilityIndex: 45, sharpeRatio: 1.2, maxDrawdown: 25 },
-                backtestData: Array.from({length: 30}, (_, i) => ({ name: `Day ${i}`, value: 100 - Math.random() * 10 })),
+                backtestData: Array.from({length: 30}, (_, i) => ({ name: `Day ${i + 1}`, value: 100 - Math.random() * 10 })),
                 alternativeActions: [],
                 message: 'Stop-Loss Update',
                 type: 'Opportunity'
@@ -314,13 +320,13 @@ export const AIInsights: React.FC = () => {
                 sourceModel: 'Yield-Hunter-Alpha',
                 timeToLive: 1800,
                 riskAnalysis: { volatilityIndex: 80, sharpeRatio: 2.5, maxDrawdown: 5 },
-                backtestData: Array.from({length: 30}, (_, i) => ({ name: `Day ${i}`, value: 100 + Math.random() * 5 })),
+                backtestData: Array.from({length: 30}, (_, i) => ({ name: `Day ${i + 1}`, value: 100 + Math.random() * 5 })),
                 alternativeActions: [],
                 message: 'High Yield Alert',
                 type: 'Opportunity'
             }
         ];
-    }, [context]);
+    }, []); // Removed `context` from dependency array as it's no longer used within the memoized function for insight generation.
 
     return (
         <Card title="AI Strategic Insights" className="h-full border-l-4 border-purple-500">

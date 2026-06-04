@@ -40,7 +40,7 @@ This component utilizes `@tanstack/react-query` for server-state management.
 
 ## Usage Example
 
-```tsx
+
 import React from 'react';
 import { InvestmentsView } from './InvestmentsView';
 
@@ -54,7 +54,7 @@ const UserDashboard = ({ currentUserId }) => {
 };
 
 export default UserDashboard;
-```
+
 
 ## Future Enhancements
 

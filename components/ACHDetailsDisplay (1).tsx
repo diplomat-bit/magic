@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ACHDetails } from '../types';
 
@@ -29,15 +28,15 @@ const ACHDetailsDisplay: React.FC<ACHDetailsDisplayProps> = ({
   const [showFullDetails, setShowFullDetails] = React.useState(!hideSensitive);
 
   if (!details) {
-    return <div>No ACH details available.</div>;
+    return <div className="p-4 text-gray-500">No ACH details available.</div>;
   }
 
   // Helper function to obscure numbers securely
   const obscureNumber = (num: string | undefined): string => {
     if (!num) return 'N/A';
-    if (num.length <= 4) return `****`;
-    const visibleLength = 4;
-    return `****${num.slice(-visibleLength)}`;
+    // If length is short, hide all; otherwise mask all but last 4
+    if (num.length <= 4) return '****';
+    return `****${num.slice(-4)}`;
   };
 
   const displayRoutingNumber = showFullDetails
@@ -49,7 +48,7 @@ const ACHDetailsDisplay: React.FC<ACHDetailsDisplayProps> = ({
     : obscureNumber(details.realAccountNumber);
 
   const toggleVisibility = () => {
-    setShowFullDetails(prev => !prev);
+    setShowFullDetails((prev) => !prev);
   };
 
   return (
@@ -60,7 +59,7 @@ const ACHDetailsDisplay: React.FC<ACHDetailsDisplayProps> = ({
         <div className="flex justify-between items-center border-b pb-2">
           <span className="text-sm font-medium text-gray-600">Routing Number:</span>
           <span
-            className={`font-mono text-base ${showFullDetails ? 'text-green-700' : 'text-red-500'}`}
+            className={`font-mono text-base ${showFullDetails ? 'text-green-700' : 'text-gray-800'}`}
             data-testid="routing-number"
           >
             {displayRoutingNumber}
@@ -70,7 +69,7 @@ const ACHDetailsDisplay: React.FC<ACHDetailsDisplayProps> = ({
         <div className="flex justify-between items-center">
           <span className="text-sm font-medium text-gray-600">Account Number:</span>
           <span
-            className={`font-mono text-base ${showFullDetails ? 'text-green-700' : 'text-red-500'}`}
+            className={`font-mono text-base ${showFullDetails ? 'text-green-700' : 'text-gray-800'}`}
             data-testid="account-number"
           >
             {displayAccountNumber}
@@ -81,7 +80,7 @@ const ACHDetailsDisplay: React.FC<ACHDetailsDisplayProps> = ({
       {hideSensitive && (
         <button
           onClick={toggleVisibility}
-          className="mt-4 text-sm px-3 py-1 rounded-md transition-colors duration-150"
+          className="mt-4 text-sm px-3 py-1 rounded-md transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-1"
           style={{
             backgroundColor: showFullDetails ? '#fcd34d' : '#3b82f6',
             color: showFullDetails ? '#1f2937' : 'white',
