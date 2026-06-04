@@ -1,16 +1,34 @@
-
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Scan, Shield, Lock, ArrowRight, Fingerprint, Globe, Building2, Infinity, Terminal, Loader2 } from 'lucide-react';
+import { Scan, Shield, Lock, ArrowRight, Fingerprint, Globe, Building2, Infinity, Terminal, AlertTriangle, RefreshCw } from 'lucide-react';
 
 export const LoginView: React.FC = () => {
-    const { loginWithCredentials, loginWithBiometrics, loginWithSSO, isAuthenticated, isLoading } = useContext(AuthContext)!;
+    const authContext = useContext(AuthContext);
     const navigate = useNavigate();
+    
     const [email, setEmail] = useState('visionary@sovereign-ai-nexus.io');
     const [password, setPassword] = useState('');
     const [authMethod, setAuthMethod] = useState<'credentials' | 'biometric' | 'sso'>('sso');
     const [handshakeStep, setHandshakeStep] = useState(0);
+    const [watchdogError, setWatchdogError] = useState<string | null>(null);
+
+    // Safeguard against broken context initialization from import-maps
+    if (!authContext) {
+        return (
+            <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6 font-sans text-white">
+                <div className="bg-black/80 border border-red-500/30 rounded-3xl p-8 max-w-md text-center space-y-4">
+                    <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
+                    <h2 className="text-xl font-bold">Context Handshake Failed</h2>
+                    <p className="text-sm text-gray-400 font-mono text-left bg-gray-900 p-4 rounded-xl border border-gray-800">
+                        AuthContext is undefined. Check if AuthProvider wraps your application tree inside index.tsx or if the module configuration failed to resolve.
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    const { loginWithCredentials, loginWithBiometrics, loginWithSSO, isAuthenticated, isLoading } = authContext;
 
     const handshakeMessages = [
         "Initializing secure tunnel...",
@@ -26,6 +44,7 @@ export const LoginView: React.FC = () => {
         }
     }, [isAuthenticated, navigate]);
 
+    // Message cycler effect
     useEffect(() => {
         if (isLoading && authMethod === 'sso') {
             const interval = setInterval(() => {
@@ -35,14 +54,37 @@ export const LoginView: React.FC = () => {
         }
     }, [isLoading, authMethod]);
 
+    // Watchdog Timeout: Break out of the loop if the auth handshake stays stuck for more than 5 seconds
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+        if (isLoading) {
+            timeoutId = setTimeout(() => {
+                setWatchdogError("Handshake timed out. The authentication server or identity provider is not responding to the current domain framework.");
+            }, 5000);
+        } else {
+            setWatchdogError(null);
+        }
+        return () => clearTimeout(timeoutId);
+    }, [isLoading]);
+
     const handleSSO = async () => {
+        setWatchdogError(null);
         setAuthMethod('sso');
-        await loginWithSSO();
+        try {
+            await loginWithSSO();
+        } catch (err: any) {
+            setWatchdogError(err.message || "SSO initialization intercepted an unhandled routing rejection.");
+        }
     };
 
-    const handleCredentials = (e: React.FormEvent) => {
+    const handleCredentials = async (e: React.FormEvent) => {
         e.preventDefault();
-        loginWithCredentials(email, password);
+        setWatchdogError(null);
+        try {
+            await loginWithCredentials(email, password);
+        } catch (err: any) {
+            setWatchdogError(err.message || "Credentials verification failed.");
+        }
     };
 
     return (
@@ -63,7 +105,26 @@ export const LoginView: React.FC = () => {
                         <p className="text-xs text-gray-500 uppercase tracking-widest mt-1 font-mono">Access Terminal Alpha-1</p>
                     </div>
 
-                    {isLoading ? (
+                    {/* Error Override Display */}
+                    {watchdogError ? (
+                        <div className="py-6 space-y-6 text-center animate-in fade-in zoom-in duration-300">
+                            <div className="w-12 h-12 bg-red-950/50 border border-red-500/40 rounded-xl mx-auto flex items-center justify-center text-red-400">
+                                <AlertTriangle size={24} />
+                            </div>
+                            <div className="space-y-2">
+                                <h3 className="text-sm font-bold text-red-400 uppercase tracking-wider">Handshake Aborted</h3>
+                                <p className="text-xs text-gray-400 bg-gray-900/80 p-4 rounded-xl border border-gray-800 text-left font-mono leading-relaxed">
+                                    {watchdogError}
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => window.location.reload()} 
+                                className="w-full flex items-center justify-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-medium py-3 rounded-xl transition-all"
+                            >
+                                <RefreshCw size={16} /> Force Reset Connection
+                            </button>
+                        </div>
+                    ) : isLoading ? (
                         <div className="py-12 space-y-8 flex flex-col items-center">
                             <div className="relative">
                                 <div className="w-24 h-24 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
