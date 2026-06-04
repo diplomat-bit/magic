@@ -618,7 +618,7 @@ const QuantumOracleView: React.FC = () => {
                 <h4 className="text-sm font-semibold text-gray-300 mb-1">AI Analysis</h4>
                 <p className="text-sm text-gray-400 leading-relaxed">
                   The simulation indicates a high probability of success based on current market vectors. 
-                  Liquidity remains within safe thresholds (>{formatCurrency(50000)}) throughout the projected period.
+                  Liquidity remains within safe thresholds (&gt;{formatCurrency(50000)}) throughout the projected period.
                 </p>
               </div>
             </Card>
