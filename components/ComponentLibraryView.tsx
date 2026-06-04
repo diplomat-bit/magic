@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState } from 'react';
 import { Cpu, Shield, Activity, CheckCircle, AlertTriangle, User, Users, Settings, BarChart2, PieChart, Database, FileText, Code, Layers, MessageSquare, Bell, HelpCircle } from 'lucide-react';
 
@@ -356,4 +356,3 @@ const A_ComponentLibraryView: React.FC = () => {
 };
 
 export default A_ComponentLibraryView;
-```

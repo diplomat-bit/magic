@@ -1,4 +1,4 @@
-```typescript
+
 import React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
@@ -413,4 +413,3 @@ namespace I_TheJamesBurvelOCallaghanIII {
 }
 
 export { H_Badge as Badge, F_badgeVariants as badgeVariants };
-```

@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 // --- The James Burvel O’Callaghan III Code: Customer Management System ---

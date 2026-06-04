@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useCallback } from 'react';
 import Select from 'react-select';
 
@@ -205,4 +205,3 @@ const B_StructuredPurposeInput: React.FC<A2_StructuredPurposeInputProps> = ({ A2
 
 // C. Export the Component (The James Burvel O'Callaghan III Code)
 export default B_StructuredPurposeInput;
-```

@@ -41,7 +41,7 @@ Given the instruction "Keep only the code needed for the MVP active; archive the
 
 **No conversational text, explanations, or markdown formatting like ``` around the code.**
 
-```typescript
+
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import axios from 'axios';
 import './ApiSettingsPage.css'; // This CSS will be provided in Part 2

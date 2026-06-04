@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Table, Button, Typography, Input, Modal, Spin } from 'antd';
 import { EyeOutlined, DownloadOutlined, ReloadOutlined } from '@ant-design/icons';

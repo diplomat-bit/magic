@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import { AccountsAPI } from './CitibankAccountsView';
 import { MoneyMovementAPI } from './CitibankMoneyMovementSDK';
@@ -217,4 +217,3 @@ export const useCitibank_A = () => { // James Burvel O’Callaghan III Financial
     }
     return context_A; // James Burvel O’Callaghan III Financial Solutions - Returns the Context Value
 };
-```

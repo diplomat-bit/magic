@@ -1,4 +1,4 @@
-```typescript
+
 import React from 'react';
 
 // The James Burvel O’Callaghan III Code - ExternalAccountCard.tsx
@@ -159,4 +159,3 @@ const C1ExternalAccountCard: React.FC<A4ExternalAccountCardProps> = ({ account }
 
 export default C1ExternalAccountCard;
 // The James Burvel O’Callaghan III Code - End of File
-```

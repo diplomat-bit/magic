@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Grid, Card, CardContent, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Tab, Tabs, Chip, Divider } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -559,4 +559,3 @@ const ConductorConfigurationView: React.FC = () => {
 };
 
 export default ConductorConfigurationView;
-```

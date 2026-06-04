@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 import {
   PlaidIdentityGetRequest,
@@ -402,4 +402,3 @@ const PlaidIdentityViewA = () => { // James Burvel O’Callaghan III Code - Prim
   );
 };
 export default PlaidIdentityViewA; // James Burvel O’Callaghan III Code - Export Primary Component - A
-```

@@ -1,4 +1,4 @@
-```typescript
+
 import React, { createContext, useContext, ReactNode, useState, useCallback, useMemo } from 'react';
 
 /**

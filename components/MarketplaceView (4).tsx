@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useContext, useState, useEffect, useReducer, useCallback, useMemo, FC, ChangeEvent, FormEvent, ReactNode } from 'react';
 import { DataContext } from '../context/DataContext';
 import Card from './Card';

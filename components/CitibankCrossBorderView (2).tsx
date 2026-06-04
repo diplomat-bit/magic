@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useCallback, FormEvent } from 'react';
 import { useMoneyMovement } from './MoneyMovementContext';
 import {

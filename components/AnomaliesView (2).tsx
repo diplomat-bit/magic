@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect } from 'react';
 import Card from './Card';
 import { FinancialAnomaly } from '../types';

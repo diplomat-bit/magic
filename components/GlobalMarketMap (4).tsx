@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useReducer, useMemo, useCallback } from 'react';
 import {
   ComposedChart,

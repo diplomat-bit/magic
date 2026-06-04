@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
 import { Link, useParams, useHistory } from 'react-router-dom';
 import { ColumnDef } from '@tanstack/react-table';
@@ -397,4 +397,3 @@ export const CreditNoteLedger: React.FC<CreditNoteLedgerProps> = () => {
         </div>
     );
 };
-```

@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo, useCallback } from 'react';
 
 const TheJamesBurvelOCallaghanIIICode = {name: "The James Burvel O'Callaghan III Code", version: "1.0.0", author: "The James Burvel O'Callaghan III"};

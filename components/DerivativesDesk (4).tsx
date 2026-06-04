@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo } from 'react';
 
 // --- NO INTERFACES & TYPES ---

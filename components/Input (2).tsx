@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { clsx, type ClassValue } from "clsx"

@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useCallback } from 'react';
 import axios, { AxiosRequestConfig, Method, AxiosResponse } from 'axios';
 import { useMoneyMovement } from './MoneyMovementContext';

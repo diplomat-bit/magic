@@ -1,5 +1,5 @@
 
-```typescript
+
 namespace TheFinancialInstrumentForge {
     type FinancialProductClass = "Structured" | "Decentralized" | "Personal";
 
@@ -58,4 +58,4 @@ namespace TheFinancialInstrumentForge {
         const renderedForge = forge.render();
     }
 }
-```
+

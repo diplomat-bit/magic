@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 
 // --- DATA MODELS AND INTERFACES ---

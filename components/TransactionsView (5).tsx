@@ -1,4 +1,4 @@
-```typescript
+
 // components/views/personal/TransactionsView.tsx
 import React, { useContext, useState, useMemo, useEffect, useCallback, useRef, useReducer, FC } from 'react';
 import { DataContext } from '../context/DataContext';

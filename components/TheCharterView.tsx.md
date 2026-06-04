@@ -1,5 +1,5 @@
 
-```typescript
+
 namespace TheCreatorsCharter {
     type Principle = string;
     type Charter = ReadonlyArray<Principle>;
@@ -77,4 +77,4 @@ namespace TheCreatorsCharter {
         }
     }
 }
-```
+

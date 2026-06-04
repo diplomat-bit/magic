@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useCallback } from 'react';
 import Card from './Card';
 import { Palette, Layout, Type, BrainCircuit, Zap, Cpu, SlidersHorizontal, Network, BarChartBig, Clock, GitBranch } from 'lucide-react';
@@ -343,4 +343,3 @@ const PersonalizationView: React.FC = () => {
 };
 
 export default PersonalizationView;
-```

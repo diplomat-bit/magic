@@ -10,27 +10,27 @@ This guide will help you get started with using Vercel Web Analytics on your pro
 - A Vercel project. If you don't have one, you can [create a new project](https://vercel.com/new).
 - The Vercel CLI installed. If you don't have it, you can install it using the following command:
 
-```bash
+
 pnpm i vercel
-```
+
 
 or
 
-```bash
+
 yarn i vercel
-```
+
 
 or
 
-```bash
+
 npm i vercel
-```
+
 
 or
 
-```bash
+
 bun i vercel
-```
+
 
 ## Enable Web Analytics in Vercel
 
@@ -43,27 +43,27 @@ On the [Vercel dashboard](/dashboard), select your Project and then click the **
 
 Using the package manager of your choice, add the `@vercel/analytics` package to your project:
 
-```bash
+
 pnpm i @vercel/analytics
-```
+
 
 or
 
-```bash
+
 yarn i @vercel/analytics
-```
+
 
 or
 
-```bash
+
 npm i @vercel/analytics
-```
+
 
 or
 
-```bash
+
 bun i @vercel/analytics
-```
+
 
 ## Add the Analytics component to your app
 
@@ -73,7 +73,7 @@ The `Analytics` component is a wrapper around the tracking script, offering more
 
 If you are using the `pages` directory, add the following code to your main app file:
 
-```tsx
+
 import type { AppProps } from "next/app";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -87,7 +87,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 }
 
 export default MyApp;
-```
+
 
 ### For Next.js (App Directory)
 
@@ -95,7 +95,7 @@ The `Analytics` component is a wrapper around the tracking script, offering more
 
 Add the following code to the root layout:
 
-```tsx
+
 import { Analytics } from "@vercel/analytics/next";
 
 export default function RootLayout({
@@ -115,7 +115,7 @@ export default function RootLayout({
     </html>
   );
 }
-```
+
 
 ### For Remix
 
@@ -123,7 +123,7 @@ The `Analytics` component is a wrapper around the tracking script, offering a se
 
 Add the following code to your root file:
 
-```tsx
+
 import {
   Links,
   LiveReload,
@@ -153,7 +153,7 @@ export default function App() {
     </html>
   );
 }
-```
+
 
 ### For Nuxt
 
@@ -161,7 +161,7 @@ The `Analytics` component is a wrapper around the tracking script, offering more
 
 Add the following code to your main component:
 
-```vue
+
 <script setup lang="ts">
 import { Analytics } from '@vercel/analytics/nuxt';
 </script>
@@ -170,7 +170,7 @@ import { Analytics } from '@vercel/analytics/nuxt';
   <Analytics />
   <NuxtPage />
 </template>
-```
+
 
 ### For SvelteKit
 
@@ -178,12 +178,12 @@ The `injectAnalytics` function is a wrapper around the tracking script, offering
 
 Add the following code to the main layout:
 
-```ts
+
 import { dev } from "$app/environment";
 import { injectAnalytics } from "@vercel/analytics/sveltekit";
 
 injectAnalytics({ mode: dev ? "development" : "production" });
-```
+
 
 ### For Astro
 
@@ -191,7 +191,7 @@ The `Analytics` component is a wrapper around the tracking script, offering more
 
 Add the following code to your base layout:
 
-```astro
+
 ---
 import Analytics from '@vercel/analytics/astro';
 {/* ... */}
@@ -207,12 +207,12 @@ import Analytics from '@vercel/analytics/astro';
 		<slot />
     </body>
 </html>
-```
+
 
 > **Note:** The `Analytics` component is available in version `@vercel/analytics@1.4.0` and later.
 > If you are using an earlier version, you must configure the `webAnalytics` property of the Vercel adapter in your `astro.config.mjs` file:
 
-```ts
+
 import { defineConfig } from "astro/config";
 import vercel from "@astrojs/vercel/serverless";
 
@@ -224,18 +224,18 @@ export default defineConfig({
     },
   }),
 });
-```
+
 
 ### For Plain HTML
 
 For plain HTML sites, you can add the following script to your `.html` files:
 
-```html
+
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js"></script>
-```
+
 
 > **💡 Note:** When using the HTML implementation, there is no need to install the
 > `@vercel/analytics` package. However, there is no route support.
@@ -248,11 +248,11 @@ Import the `inject` function from the package, which will add the tracking scrip
 
 Add the following code to your main app file:
 
-```ts
+
 import { inject } from "@vercel/analytics";
 
 inject();
-```
+
 
 ### For Create React App
 
@@ -262,7 +262,7 @@ The `Analytics` component is a wrapper around the tracking script, offering more
 
 Add the following code to the main app file:
 
-```tsx
+
 import { Analytics } from "@vercel/analytics/react";
 
 export default function App() {
@@ -273,7 +273,7 @@ export default function App() {
     </div>
   );
 }
-```
+
 
 ### For Vue
 
@@ -283,7 +283,7 @@ The `Analytics` component is a wrapper around the tracking script, offering more
 
 Add the following code to your main component:
 
-```vue
+
 <script setup lang="ts">
 import { Analytics } from '@vercel/analytics/vue';
 </script>
@@ -292,15 +292,15 @@ import { Analytics } from '@vercel/analytics/vue';
   <Analytics />
   <!-- your content -->
 </template>
-```
+
 
 ## Deploy your app to Vercel
 
 Deploy your app using the following command:
 
-```bash
+
 vercel deploy
-```
+
 
 If you haven't already, we also recommend [connecting your project's Git repository](/docs/git#deploying-a-git-repository),
 which will enable Vercel to deploy your latest commits to main without terminal commands.

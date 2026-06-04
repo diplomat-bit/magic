@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,

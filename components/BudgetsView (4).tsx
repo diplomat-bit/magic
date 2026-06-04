@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useContext, useState, useEffect } from 'react';
 import Card from './Card';
 import { DataContext, Budget, Transaction } from '../context/DataContext';

@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo, useEffect, FC, createContext, useContext, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Card from './Card';

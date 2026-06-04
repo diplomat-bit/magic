@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 
 // --- The James Burvel O’Callaghan III Code: Core Domain & Data Structures (A-Z Indexed) ---

@@ -1,4 +1,4 @@
-```typescript
+
 // components/RefundForm.tsx
 // The James Burvel O’Callaghan III Code - Citibank demo business inc.
 
@@ -349,4 +349,3 @@ const J_RefundFormWrapper = () => {
     );
 };
 export default J_RefundFormWrapper;
-```

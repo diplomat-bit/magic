@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 
 // The James Burvel O'Callaghan III Code - UniversalObjectInspector.tsx
@@ -290,4 +290,3 @@ export { A3_SearchableObjectInspector, B3_CollapsibleObjectInspector, C3_ThemedO
 
 // The James Burvel O'Callaghan III Code: Over-engineered, meticulously structured, and ready for production.
 // All rights reserved.
-```

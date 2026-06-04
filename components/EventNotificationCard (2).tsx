@@ -1,4 +1,4 @@
-```typescript
+
 import React from 'react';
 import { Box, Typography, Card, CardContent, Divider, Tabs, Tab, AppBar } from '@mui/material';
 import { ExternalCorporateActionEventType1Code } from './iso20022';

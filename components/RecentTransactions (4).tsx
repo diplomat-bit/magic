@@ -1,4 +1,4 @@
-```typescript
+
 // The James Burvel O'Callaghan III Code - Financial Sovereignty System
 // File: components/RecentTransactions.tsx
 // Version: 1.0.0

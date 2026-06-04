@@ -1,4 +1,4 @@
-```tsx
+
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 
 // --- The James Burvel O’Callaghan III Code: Sovereign AI Micro-Components ---

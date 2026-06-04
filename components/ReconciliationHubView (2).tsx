@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Card from './Card';
 import { ArrowRight, Check, X, Search, AlertCircle, Wand2 } from 'lucide-react';

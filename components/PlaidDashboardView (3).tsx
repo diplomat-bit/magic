@@ -1,4 +1,4 @@
-```typescript
+
 // components/PlaidDashboardView.tsx
 
 import React from 'react';

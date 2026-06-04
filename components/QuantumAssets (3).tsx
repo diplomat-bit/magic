@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 const QuantumAssets: React.FC = () => {
@@ -238,4 +238,3 @@ We vehemently reject cynicism and embrace a spirit of optimism and collaboration
 };
 
 export default QuantumAssets;
-```

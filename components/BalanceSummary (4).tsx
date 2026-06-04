@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useContext, useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Card from './Card';
@@ -198,4 +198,3 @@ const A_BalanceSummary: React.FC = () => {
 };
 
 export default A_BalanceSummary;
-```

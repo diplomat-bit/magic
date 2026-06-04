@@ -1,4 +1,4 @@
-```typescript
+
 import React from 'react';
 
 // The James Burvel O’Callaghan III Code - Subscription List Component

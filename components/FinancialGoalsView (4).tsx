@@ -1,4 +1,4 @@
-```typescript
+
 import React, { useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { DataContext } from '../context/DataContext';
 import Card from './Card';
@@ -330,4 +330,3 @@ const FinancialGoalsView: React.FC = () => {
 };
 
 export default FinancialGoalsView;
-```
