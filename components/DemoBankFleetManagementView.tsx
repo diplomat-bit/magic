@@ -1,7 +1,7 @@
 // components/views/platform/DemoBankFleetManagementView.tsx
 import React, { useState } from 'react';
 import Card from '../../Card';
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 
 const DemoBankFleetManagementView: React.FC = () => {
     const [prompt, setPrompt] = useState("Warehouse A -> 123 Main St, Anytown -> 456 Oak Ave, Anytown -> 789 Pine Ln, Anytown -> Warehouse A");
@@ -13,18 +13,20 @@ const DemoBankFleetManagementView: React.FC = () => {
         setGeneratedRoute(null);
         try {
             const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+            
             const schema = {
-                type: Type.OBJECT,
+                type: "OBJECT",
                 properties: {
                     optimizedRoute: {
-                        type: Type.ARRAY,
-                        items: { type: Type.STRING }
+                        type: "ARRAY",
+                        items: { type: "STRING" }
                     },
-                    estimatedTime: { type: Type.STRING },
-                    estimatedDistance: { type: Type.STRING },
+                    estimatedTime: { type: "STRING" },
+                    estimatedDistance: { type: "STRING" },
                 },
                 required: ["optimizedRoute", "estimatedTime", "estimatedDistance"]
             };
+
             const fullPrompt = `You are a logistics expert. Based on this list of stops, generate an optimized delivery route (re-ordering the stops between the start and end point), and provide a realistic estimated time and distance. Stops: "${prompt}".`;
             
             const response = await ai.models.generateContent({ 
