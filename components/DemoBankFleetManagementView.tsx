@@ -22,13 +22,25 @@ const DemoBankFleetManagementView: React.FC = () => {
                     },
                     estimatedTime: { type: Type.STRING },
                     estimatedDistance: { type: Type.STRING },
-                }
+                },
+                required: ["optimizedRoute", "estimatedTime", "estimatedDistance"]
             };
             const fullPrompt = `You are a logistics expert. Based on this list of stops, generate an optimized delivery route (re-ordering the stops between the start and end point), and provide a realistic estimated time and distance. Stops: "${prompt}".`;
-            const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: fullPrompt, config: { responseMimeType: "application/json", responseSchema: schema } });
-            setGeneratedRoute(JSON.parse(response.text));
+            
+            const response = await ai.models.generateContent({ 
+                model: 'gemini-2.0-flash', 
+                contents: fullPrompt, 
+                config: { 
+                    responseMimeType: "application/json", 
+                    responseSchema: schema 
+                } 
+            });
+            
+            if (response.text) {
+                setGeneratedRoute(JSON.parse(response.text));
+            }
         } catch (error) {
-            console.error(error);
+            console.error("Error generating route:", error);
         } finally {
             setIsLoading(false);
         }
@@ -44,7 +56,11 @@ const DemoBankFleetManagementView: React.FC = () => {
                     onChange={e => setPrompt(e.target.value)}
                     className="w-full h-24 bg-gray-700/50 p-3 rounded text-white font-mono text-sm focus:ring-cyan-500 focus:border-cyan-500"
                 />
-                <button onClick={handleGenerate} disabled={isLoading} className="w-full mt-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded disabled:opacity-50 transition-colors">
+                <button 
+                    onClick={handleGenerate} 
+                    disabled={isLoading} 
+                    className="w-full mt-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded disabled:opacity-50 transition-colors text-white"
+                >
                     {isLoading ? 'Optimizing...' : 'Generate Optimized Route'}
                 </button>
             </Card>
@@ -52,7 +68,7 @@ const DemoBankFleetManagementView: React.FC = () => {
             {(isLoading || generatedRoute) && (
                  <Card title="Optimized Route">
                      <div className="space-y-4">
-                        {isLoading ? <p>Optimizing...</p> : (
+                        {isLoading ? <p className="text-gray-300">Optimizing...</p> : generatedRoute && (
                             <>
                                 <div className="flex justify-around text-center p-4 bg-gray-900/50 rounded-lg">
                                     <div><p className="text-sm text-gray-400">Est. Time</p><p className="text-xl font-semibold text-white">{generatedRoute.estimatedTime}</p></div>
