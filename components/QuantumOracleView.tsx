@@ -2,7 +2,6 @@
 import React, { useState, useContext, useEffect, useRef, useCallback } from 'react';
 import Card from '../../Card';
 import { DataContext } from '../../../context/DataContext';
-// @ts-ignore - Importing based on instruction, assuming package availability
 import { GoogleGenAI } from '@google/genai';
 import { 
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -397,8 +396,7 @@ const QuantumOracleView: React.FC = () => {
 
       } else {
         // 2. Real AI Call
-        const genAI = new GoogleGenAI({ apiKey });
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Using a standard model name
+        const ai = new GoogleGenAI({ apiKey });
 
         const systemPrompt = `
           You are the Quantum Financial Oracle for "The Demo Bank" (Quantum Financial).
@@ -426,9 +424,15 @@ const QuantumOracleView: React.FC = () => {
           Keep your text response concise, professional, and encouraging. Use metaphors like "engine", "velocity", "trajectory".
         `;
 
-        const result = await model.generateContent([systemPrompt, input]);
-        const response = result.response;
-        const text = response.text();
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: input,
+          config: {
+            systemInstruction: systemPrompt
+          }
+        });
+        
+        const text = response.text;
 
         // Parse for JSON blocks
         const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
@@ -505,7 +509,7 @@ const QuantumOracleView: React.FC = () => {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-black text-white tracking-tighter uppercase flex items-center gap-3">
-            <span className="text-cyan-500 text-4xl">❖</span> Quantum Oracle
+            <span className="text-cyan-500 text-4xl">⬢</span> Quantum Oracle
           </h1>
           <p className="text-gray-400 text-sm mt-1">Advanced Financial Simulation & Execution Engine</p>
         </div>
